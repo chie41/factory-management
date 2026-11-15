@@ -233,19 +233,30 @@ export function GoldDailyPreview() {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(next) || next===date) return
     setOpenedDays(prev=>({...prev,[date]:data}))
     setDate(next)
-    setData(openedDays[next] ?? demoDay(next,effectiveGoldTemplate(versions,next)))
-    navigate('/gold/daily/' + next)
+    setData(isDemo ? (openedDays[next] ?? demoDay(next,effectiveGoldTemplate(versions,next))) : demoDay('1000-01-01',INITIAL_GOLD_TEMPLATE))
+    navigate('/gold/daily/' + next + (isDemo?'?demo=1':''))
   }
   const moveDate = (delta:number) => {
     const day=new Date(date+'T12:00:00')
     day.setDate(day.getDate()+delta)
     changeDate(dateString(day))
   }
-  const saveLayout = (next:GoldLayoutTemplate,scope:LayoutSaveScope) => {
+  const saveLayout = async (next:GoldLayoutTemplate,scope:LayoutSaveScope) => {
     if (scope==='future' && !canManageDefaults) return
-    if (scope==='future') setVersions(prev=>upsertTemplateVersion(prev,{effectiveFrom:date,template:next}))
-    setData(prev=>applyLayout(prev,next))
-    setSettingsOpen(false)
+    if (!isDemo && (!session || !isEditable)) {message.error('Phiên không cho phép sửa cấu hình.');return}
+    setBusy(true)
+    try {
+      if(scope==='future'){
+        if(!isDemo)await goldSessionApi.saveDefaultTemplate(date,next)
+        setVersions(prev=>upsertTemplateVersion(prev,{effectiveFrom:date,template:next}))
+      }
+      const nextDay=applyLayout(data,next)
+      if(isDemo) setData(nextDay)
+      else await saveReal(nextDay)
+      setSettingsOpen(false)
+      if(!isDemo)message.success('Đã lưu thiết lập mẫu')
+    }catch {message.error('Không lưu được thiết lập; dữ liệu chưa thay đổi trên máy chủ.');void query.refetch()}
+    finally{setBusy(false)}
   }
   const confirmRemoveWork = () => {
     if (!pendingRemove) return
