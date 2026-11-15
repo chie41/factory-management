@@ -55,7 +55,7 @@ const scaleColumns = 'minmax(0,1.7fr) minmax(0,1fr) minmax(0,1.05fr)'
 const amountColumns = 'minmax(0,1.7fr) minmax(0,.75fr) minmax(0,1.3fr)'
 const otherColumns = 'minmax(0,1.8fr) minmax(0,.92fr) minmax(0,.92fr)'
 export const NO_BOX_ID = 'none'
-export function GoldScaleTable({ rows, boxes, onChange, onAdd }: {
+export function GoldScaleTable({ rows, boxes, onChange, onAdd, disabled=false }: {
   rows: GoldScaleRow[]
   boxes: GoldBox[]
   onChange: (index: number, key: keyof GoldScaleRow, value: string) => void
@@ -82,7 +82,7 @@ export function GoldScaleTable({ rows, boxes, onChange, onAdd }: {
     })}
   </EntryBlock>
 }
-export function GoldBagsTable({ rows, onChange, onAdd }: {
+export function GoldBagsTable({ rows, onChange, onAdd, disabled=false }: {
   rows: GoldAmountRow[]
   onChange: (index: number, key: keyof GoldAmountRow, value: string) => void
   onAdd: () => void
@@ -97,7 +97,7 @@ export function GoldBagsTable({ rows, onChange, onAdd }: {
     </div>)}
   </EntryBlock>
 }
-export function GoldLabelsTable({ rows, onChange, onAdd }: {
+export function GoldLabelsTable({ rows, onChange, onAdd, disabled=false }: {
   rows: GoldAmountRow[]
   onChange: (index: number, key: keyof GoldAmountRow, value: string) => void
   onAdd: () => void
@@ -112,7 +112,7 @@ export function GoldLabelsTable({ rows, onChange, onAdd }: {
     </div>)}
   </EntryBlock>
 }
-export function GoldOtherTable({ rows, onChange, onAdd }: {
+export function GoldOtherTable({ rows, onChange, onAdd, disabled=false }: {
   rows: GoldOtherRow[]
   onChange: (index: number, key: keyof GoldOtherRow, value: string) => void
   onAdd: () => void
