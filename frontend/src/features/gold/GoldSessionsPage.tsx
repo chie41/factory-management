@@ -3,6 +3,7 @@ import { Button, Empty, Select, Table, Tag, Typography } from 'antd'
 import { CalendarOutlined, LeftOutlined, RightOutlined, EyeOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import './GoldSessionsPage.css'
+import { goldDemoDifference, goldDemoTotal } from './goldDemoFigures'
 
 type GoldSessionStatus = 'DRAFT' | 'FINALIZED' | 'LOCKED' | 'REOPENED'
 type GoldSessionListItem = {
@@ -52,8 +53,6 @@ function createPreviewSessions(month: string): GoldSessionListItem[] {
     : new Date(year, monthNumber, 0).getDate()
   const days = Array.from({length: Math.min(12, endDay)}, (_, i) => endDay - i)
   const statuses: GoldSessionStatus[] = ['DRAFT', 'LOCKED', 'FINALIZED', 'LOCKED', 'FINALIZED', 'REOPENED', 'LOCKED', 'FINALIZED', 'LOCKED', 'FINALIZED', 'LOCKED', 'FINALIZED']
-  const totals = ['9104.20', '9099.85', '9102.30', '9098.75', '9106.10', '9101.40', '9095.90', '9097.65', '9100.25', '9103.80', '9094.30', '9098.20']
-  const differences = [null, '-0.35', '2.45', '-3.55', '7.35', '-4.70', '-5.50', '1.75', '2.60', '3.55', '-9.50', '3.90']
   return days.map((day, i) => {
     const sessionDate = month + '-' + String(day).padStart(2, '0')
     return {
@@ -61,8 +60,8 @@ function createPreviewSessions(month: string): GoldSessionListItem[] {
       sessionDate,
       finalizedAt: statuses[i] === 'DRAFT' ? null : sessionDate + 'T' + String(17 + (i % 4)).padStart(2, '0') + ':30:00',
       operatorName: ['Nguyễn Văn An', 'Trần Thị Lan', 'Phạm Minh Anh'][i % 3],
-      totalGoldG: statuses[i] === 'DRAFT' ? null : totals[i],
-      differenceG: statuses[i] === 'DRAFT' ? null : differences[i],
+      totalGoldG: goldDemoTotal(sessionDate),
+      differenceG: goldDemoDifference(sessionDate),
       status: statuses[i],
     }
   })
@@ -129,10 +128,10 @@ export function GoldSessionsPage() {
           {title:'Tổng vàng tịnh được',dataIndex:'totalGoldG',width:180,align:'right',render:formatGrams},
           {title:'Chênh lệch',dataIndex:'differenceG',width:140,align:'right',render:(v:string|null)=><span style={{color:v && Number(v)<0?'#cf1322':undefined}}>{v && Number(v)>0?'+':''}{formatGrams(v)}</span>},
           {title:'Trạng thái',dataIndex:'status',width:150,render:(value:GoldSessionStatus)=><Tag color={STATUS_COLOR[value]}>{STATUS_LABEL[value]}</Tag>},
-          {title:'',key:'action',width:120,render:(_,row)=><Button type="link" icon={<EyeOutlined/>} onClick={()=>navigate('/gold/daily/'+row.sessionDate)}>Xem mẫu</Button>},
+          {title:'',key:'action',width:120,render:(_,row)=><Button type="link" icon={<EyeOutlined/>} onClick={()=>navigate('/gold/daily/'+row.sessionDate)}>{row.sessionDate === isoLocalDate(new Date()) ? 'Xem phiên có dữ liệu' : 'Xem mẫu'}</Button>},
         ]}
       />
     </div>
-    <div className="gold-sessions-preview-note">Toàn bộ dòng trong bảng là dữ liệu giả lập để duyệt UI, không phải phiên đã lưu. Bấm “Xem mẫu” chỉ mở trang nhập liệu xem trước; chưa có API đọc, lưu, chốt hoặc khóa phiên.</div>
+    <div className="gold-sessions-preview-note">Toàn bộ dòng trong bảng là dữ liệu giả lập để duyệt UI. Bấm “Xem mẫu” sẽ mở chi tiết có sẵn công việc thợ, vàng cân, túi bóng, nhãn đá và tổng kết trong tháng hiện tại. Chưa có API lưu, chốt hoặc khóa phiên.</div>
   </div>
 }
