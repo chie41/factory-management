@@ -3,7 +3,7 @@ import { CloseOutlined, PlusOutlined } from '@ant-design/icons'
 import { formatGold, numberOrNull, sumGold } from './GoldDailyTables'
 
 /** id must identify one production assignment/transaction line, never just the batch code. */
-export type GoldWork = { id: string; title: string; workDate: string; issued: string; returned?: string }
+export type GoldWork = { id: string; title: string; workDate: string; issued: string; returned?: string | null }
 export type GoldWorker = { id: string; name: string; jobs: GoldWork[] }
 
 export function GoldWorkerCard({ worker, onPick, onRemove, disabled=false }: {
@@ -14,7 +14,7 @@ export function GoldWorkerCard({ worker, onPick, onRemove, disabled=false }: {
 }) {
   const issued = sumGold(worker.jobs.map(job => numberOrNull(job.issued)))
   const returned = sumGold(worker.jobs.map(job => numberOrNull(job.returned)))
-  const allComplete = worker.jobs.every(job => job.returned !== undefined)
+  const allComplete = worker.jobs.every(job => job.returned != null)
   const diff = allComplete ? returned - issued : null
   return <section className="gold-worker">
     <header className="gold-worker-header">
