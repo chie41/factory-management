@@ -298,12 +298,19 @@ export function GoldDailyPreview() {
         <Button size="small" aria-label="Ngày trước" onClick={()=>moveDate(-1)} icon={<LeftOutlined/>}/>
         <input className="gold-date-input" type="date" aria-label="Ngày tịnh vàng" value={date} onChange={e=>changeDate(e.target.value)}/>
         <Button size="small" aria-label="Ngày sau" onClick={()=>moveDate(1)} icon={<RightOutlined/>}/>
-        <Button size="small" icon={<SettingOutlined/>} onClick={()=>setSettingsOpen(true)}>Thiết lập mẫu</Button>
-        <Button size="small" disabled title="Chờ API snapshot từ Sản xuất và Sổ giao dịch khách hàng" icon={<ReloadOutlined/>}>Reload dữ liệu</Button>
-        <Tag color="blue">Bản xem trước</Tag>
+        <Button size="small" icon={<SettingOutlined/>} disabled={!isEditable||busy} onClick={()=>setSettingsOpen(true)}>Thiết lập mẫu</Button>
+        <Button size="small" disabled={!isEditable||isDemo||busy} icon={<ReloadOutlined/>} onClick={reloadReal}>Reload dữ liệu</Button>
+        {!isDemo && session && isEditable && <Button type="primary" size="small" loading={busy} icon={<SaveOutlined/>} onClick={()=>void saveDraft()}>Lưu nháp</Button>}
+        {!isDemo && !session && canEdit && <Button type="primary" size="small" loading={busy} onClick={()=>void createReal()}>Bắt đầu phiên</Button>}
+        {!isDemo && session && (session.status==='LOCKED'||session.status==='FINALIZED') && canReopen && <Button size="small" icon={<UnlockOutlined/>} onClick={()=>setReopenOpen(true)}>Mở lại phiên</Button>}
+        <Tag color={isDemo?'orange':session?.status==='LOCKED'?'default':session?.status==='FINALIZED'?'green':'blue'}>{isDemo?'Dữ liệu mẫu':session?({DRAFT:'Đang nhập',FINALIZED:'Đã chốt',LOCKED:'Đã khóa',REOPENED:'Đã mở lại'}[session.status]):'Chưa có phiên'}</Tag>
       </div>
     </div>
-    <div className="gold-preview-note"><InfoCircleOutlined/> DỮ LIỆU MẪU: công việc, vàng cân và tổng kết chỉ phục vụ xem giao diện, không phải số liệu đã lưu. Thay đổi sẽ mất khi tải lại trang.</div>
+    {isDemo ? <div className="gold-preview-note"><InfoCircleOutlined/> DỮ LIỆU MẪU — không lưu database. Thoát và mở lại để xem phiên thực.</div>
+      : <div className="gold-preview-note"><InfoCircleOutlined/> Phiên thực sử dụng snapshot từ Sản xuất và Sổ khách hàng. Nhấn Lưu nháp sau khi sửa; nguồn không tự đổi.</div>}
+    {!isDemo && query.isError && <Alert type="error" style={{marginBottom:12}} title="Không tải được phiên Tịnh vàng" description="Kiểm tra backend, migration và quyền gold.sessions.read." />}
+    {!isDemo && !session && !query.isFetching && !query.isError && <Alert type="info" style={{marginBottom:12}} title="Ngày này chưa có phiên Tịnh vàng" description="Nhấn Bắt đầu phiên để tạo và lấy dữ liệu." />}
+    {!isDemo && session && !isEditable && <Alert type="warning" style={{marginBottom:12}} title="Phiên đang ở chế độ chỉ đọc" description="Phiên đã chốt/khóa. Chỉ Admin có quyền mở lại." />}
     <div className="gold-page-layout">
       <div className="gold-main-sheet">
         <div className="gold-debt-card">
