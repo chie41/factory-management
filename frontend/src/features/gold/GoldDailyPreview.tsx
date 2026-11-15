@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { Button, Modal, Tag, Typography } from 'antd'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { goldSessionApi, type GoldSession } from './goldSessionApi'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Alert, Button, Input, Modal, Tag, Typography, message } from 'antd'
 import { usePermissions } from '../auth/hooks/usePermissions'
-import { LeftOutlined, RightOutlined, ReloadOutlined, InfoCircleOutlined, SettingOutlined, ArrowLeftOutlined } from '@ant-design/icons'
+import { LeftOutlined, RightOutlined, ReloadOutlined, InfoCircleOutlined, SettingOutlined, ArrowLeftOutlined, SaveOutlined, UnlockOutlined } from '@ant-design/icons'
 import { GoldScaleTable, GoldBagsTable, GoldLabelsTable, GoldOtherTable, numberOrNull, sumGold, formatGold, NO_BOX_ID, type GoldScaleRow, type GoldAmountRow, type GoldOtherRow } from './GoldDailyTables'
 import { GoldWorkerCard, type GoldWorker, type GoldWork } from './GoldWorkerCard'
 import { GoldWorkPicker } from './GoldWorkPicker'
@@ -65,6 +67,24 @@ function demoDay(date:string, template: GoldLayoutTemplate): GoldDay {
     layout:cloneGoldTemplate(template),
   }
 }
+function fromSession(session:GoldSession):GoldDay {
+  const selected = new Set(session.selected_work_ids)
+  const availableWorks = Object.fromEntries(session.source_snapshot.workers.map(w=>[w.id,w.jobs]))
+  return {
+    workers: session.source_snapshot.workers.map(w=>({...w,jobs:w.jobs.filter(job=>selected.has(job.id))})),
+    availableWorks,
+    scales:session.manual_entries.scales,
+    bags:session.manual_entries.bags,
+    labels:session.manual_entries.labels,
+    others:session.manual_entries.others,
+    debt:session.source_snapshot.customerDebt,
+    previous:session.totals_snapshot?.previous_gold_g??null,
+    layout:session.layout_snapshot,
+  }
+}
+function manualFromDay(day:GoldDay) {
+  return {scales:day.scales,bags:day.bags,labels:day.labels,others:day.others}
+}
 function applyLayout(day: GoldDay, next: GoldLayoutTemplate): GoldDay {
   const oldPresetCount=day.layout.bagWeights.length
   const leftover = day.bags.slice(next.bagWeights.length, oldPresetCount)
@@ -84,19 +104,122 @@ const dateString = (date:Date) => date.getFullYear()+'-'+String(date.getMonth()+
 
 export function GoldDailyPreview() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const isDemo = new URLSearchParams(location.search).get('demo')==='1'
+  const queryClient = useQueryClient()
   const { date: routeDate } = useParams<{ date: string }>()
   const initialDate = routeDate && /^\d{4}-\d{2}-\d{2}$/.test(routeDate) ? routeDate : dateString(new Date())
   const { can } = usePermissions()
   // Preview approximation only; backend must enforce ADMIN role on persisted defaults.
-  const canManageDefaults = can('roles.manage')
+  const canManageDefaults = can('gold.templates.manage')
+  const canEdit = can('gold.sessions.edit')
+  const canFinalize = can('gold.sessions.finalize')
+  const canReopen = can('gold.sessions.reopen')
   const [date,setDate] = useState(initialDate)
   const [versions,setVersions] = useState<GoldTemplateVersion[]>(initialVersions)
-  const [data,setData] = useState<GoldDay>(()=>demoDay(initialDate,INITIAL_GOLD_TEMPLATE))
+  const [data,setData] = useState<GoldDay>(()=>demoDay(isDemo?initialDate:'1000-01-01',INITIAL_GOLD_TEMPLATE))
   const [openedDays,setOpenedDays] = useState<Record<string,GoldDay>>({})
   const [settingsOpen,setSettingsOpen] = useState(false)
   const [debtOpen,setDebtOpen] = useState(false)
   const [pickerWorkerId,setPickerWorkerId] = useState<string | null>(null)
+  const [busy,setBusy] = useState(false)
+  const [reopenOpen,setReopenOpen] = useState(false)
+  const [reopenReason,setReopenReason] = useState('')
   const [pendingRemove,setPendingRemove] = useState<{workerId:string;workId:string} | null>(null)
+  const query = useQuery({
+    queryKey:['gold-refining-by-date',date],
+    queryFn:()=>goldSessionApi.byDate(date),
+    enabled:!isDemo,
+    staleTime:0,
+  })
+  const session = query.data
+  const isEditable = isDemo || (session && (session.status==='DRAFT'||session.status==='REOPENED') && canEdit)
+  useEffect(() => {
+    if(isDemo){setData(demoDay(date,effectiveGoldTemplate(versions,date)));return}
+    if(session){setData(fromSession(session))}
+    else if(!query.isFetching&&!query.isPending){setData(demoDay('1000-01-01',INITIAL_GOLD_TEMPLATE))}
+    // Session versions are authoritative; local changes remain until a server update.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[isDemo,session?.id,session?.version])
+  const applyServerSession = (updated:GoldSession) => {
+    queryClient.setQueryData(['gold-refining-by-date',updated.business_date],updated)
+    setData(fromSession(updated))
+    void queryClient.invalidateQueries({queryKey:['gold-refining-sessions']})
+  }
+  const createReal = async () => {
+    if(isDemo || !canEdit) return
+    setBusy(true)
+    try {
+      const created=await goldSessionApi.create(date)
+      applyServerSession(created)
+      message.success('Đã tạo phiên Tịnh vàng')
+    } catch {
+      message.error('Không tạo được phiên. Có thể ngày này đã có phiên khác hoặc chưa được cấp quyền.')
+      void query.refetch()
+    } finally {setBusy(false)}
+  }
+  const saveReal = async (nextDay=data) => {
+    if(isDemo || !session || !isEditable) return null
+    const result=await goldSessionApi.save(session,manualFromDay(nextDay),
+      nextDay.workers.flatMap(w=>w.jobs.map(job=>job.id)),nextDay.layout)
+    applyServerSession(result)
+    return result
+  }
+  const saveDraft = async () => {
+    setBusy(true)
+    try {
+      const saved=await saveReal()
+      if(saved)message.success('Đã lưu phiên')
+    }catch {message.error('Không lưu được phiên. Kiểm tra dữ liệu và phiên bản mới nhất.');void query.refetch()}
+    finally {setBusy(false)}
+  }
+  const reloadReal = () => {
+    if(isDemo || !session || !isEditable)return
+    Modal.confirm({
+      title:'Reload dữ liệu Sản xuất và Khách nợ',
+      content:'Nguồn dữ liệu sẽ được chụp lại tại thời điểm reload. Các ô cân/túi/nhãn/khác đã lưu được giữ nguyên; công việc không còn trong nguồn có thể bị bỏ chọn. Hãy lưu nháp trước khi reload nếu đang nhập dở.',
+      okText:'Reload dữ liệu',cancelText:'Hủy',
+      onOk:async()=>{
+        try{
+          const response=await goldSessionApi.reload(session)
+          applyServerSession(response.data)
+          if(response.warnings?.removedWorkIds?.length) message.warning('Một số công việc không còn trong nguồn đã bị bỏ chọn. Vui lòng kiểm tra lại.')
+          else message.success('Đã cập nhật snapshot dữ liệu')
+        }catch{message.error('Không reload được. Kiểm tra quyền hoặc phiên bản hiện tại.');void query.refetch()}
+      },
+    })
+  }
+  const finalizeReal = () => {
+    if(isDemo || !session || !canFinalize || !isEditable)return
+    Modal.confirm({
+      title:'Xác nhận chốt phiên Tịnh vàng',
+      content:'Hệ thống sẽ lưu số liệu đang nhập, tính lại tổng và chốt phiên. Sau thời gian khóa, chỉ Admin mới được mở lại.',
+      okText:'Chốt phiên',cancelText:'Hủy',
+      onOk:async()=>{
+        setBusy(true)
+        try{
+          const saved=await saveReal()
+          if(!saved)return
+          const finalized=await goldSessionApi.finalize(saved)
+          applyServerSession(finalized)
+          message.success('Đã chốt phiên Tịnh vàng')
+        }catch{message.error('Không chốt được phiên. Kiểm tra ô nhập và tải lại để tránh ghi đè.');void query.refetch()}
+        finally{setBusy(false)}
+      },
+    })
+  }
+  const reopenReal = async()=>{
+    if(isDemo || !session || !canReopen || reopenReason.trim().length<8)return
+    setBusy(true)
+    try{
+      const updated=await goldSessionApi.reopen(session,reopenReason.trim())
+      applyServerSession(updated)
+      setReopenOpen(false)
+      setReopenReason('')
+      message.success('Đã mở lại phiên')
+    }catch{message.error('Không mở lại được. Kiểm tra quyền Admin và phiên bản.');void query.refetch()}
+    finally{setBusy(false)}
+  }
   useEffect(() => {
     if (routeDate && /^\d{4}-\d{2}-\d{2}$/.test(routeDate) && routeDate !== date) {
       setOpenedDays(prev=>({...prev,[date]:data}))
