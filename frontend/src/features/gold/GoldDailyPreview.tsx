@@ -227,7 +227,7 @@ export function GoldDailyPreview() {
     if (routeDate && /^\d{4}-\d{2}-\d{2}$/.test(routeDate) && routeDate !== date) {
       setOpenedDays(prev=>({...prev,[date]:data}))
       setDate(routeDate)
-      setData(openedDays[routeDate] ?? demoDay(routeDate,effectiveGoldTemplate(versions,routeDate)))
+      setData(isDemo ? (openedDays[routeDate] ?? demoDay(routeDate,effectiveGoldTemplate(versions,routeDate))) : demoDay('1000-01-01',INITIAL_GOLD_TEMPLATE))
     }
     // Only respond to browser navigation to another day, not local edit activity.
     // eslint-disable-next-line react-hooks/exhaustive-deps
