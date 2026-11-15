@@ -1,0 +1,125 @@
+.gold-daily-page{width:100%;min-width:0;color:#172b4d;padding-bottom:40px;font-family:Inter,system-ui,'Segoe UI',sans-serif}
+.gold-page-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+.gold-page-heading h3.ant-typography{font-size:25px;font-weight:650;line-height:32px;margin:0 0 4px;color:#172b4d}
+.gold-page-heading .ant-typography-secondary{font-size:12px;color:#667085}
+.gold-date-controls{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.gold-date-input{width:150px;height:31px;padding:0 10px;border:1px solid #d9dfe8;background:#fff;border-radius:5px;color:#172b4d}
+.gold-preview-note{display:flex;gap:8px;align-items:center;background:#fffbe6;color:#6d5b1c;border:1px solid #ffe58f;border-radius:5px;padding:9px 12px;font-size:12px;margin:0 0 16px}
+.gold-page-layout{display:grid;grid-template-columns:minmax(0,1fr) 288px;gap:16px;align-items:start}
+.gold-main-sheet{display:flex;flex-direction:column;gap:12px;min-width:0}
+.gold-debt-card{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;min-height:52px;padding:8px 12px;border:1px solid #e0e0e0;border-radius:8px;background:#fff}
+.gold-debt-card>strong{font-size:11px;font-weight:600;color:#667085}
+.gold-debt-card>b{font-size:21px;font-weight:700;text-align:center;white-space:nowrap}
+.gold-debt-card>.ant-btn{justify-self:end;font-size:12px;padding-right:2px}
+.gold-workers-section{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:9px 8px 8px}
+.gold-workers-heading{display:flex;justify-content:space-between;align-items:center;min-height:52px;padding:0 2px 7px 0}
+.gold-workers-heading h2{font-size:15px;color:#172b4d;font-weight:650;margin:0}
+.gold-workers-heading>div{text-align:right;display:flex;flex-direction:column}
+.gold-workers-heading span{color:#667085;font-size:10px}
+.gold-workers-heading strong{color:#172b4d;font-size:19px}
+.gold-workers-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.gold-worker{border:1px solid #d6d6d6;border-radius:6px;overflow:hidden;min-width:0;background:#fff}
+.gold-worker-header{min-height:38px;background:#f2f2f2;border-bottom:1px solid #e8e8e8;display:flex;justify-content:space-between;align-items:center;padding:0 10px;gap:4px}
+.gold-worker-header strong{font-size:14px;color:#333}
+.gold-worker-header span{font-size:9px;color:#8c8c8c}
+.gold-worker-sheet{width:100%;table-layout:fixed;border-collapse:collapse;color:#383838}
+.gold-worker-sheet th,.gold-worker-sheet td{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-right:1px solid #e8e8e8;border-bottom:1px solid #f0f0f0;padding:0 5px;height:40px;line-height:16px;font-size:11px;text-align:right;font-variant-numeric:tabular-nums}
+.gold-worker-sheet th:first-child,.gold-worker-sheet td:first-child{text-align:left;padding-left:8px}
+.gold-worker-sheet th:last-child,.gold-worker-sheet td:last-child{border-right:0}
+.gold-worker-sheet thead th{height:34px;background:#fafafa;color:#737373;font-size:9px;font-weight:600}
+.gold-worker-sheet tfoot th,.gold-worker-sheet tfoot td{height:40px;background:#fafafa;font-weight:600}
+.gold-diff-negative{color:#f5222d!important;font-weight:600}
+.gold-diff-positive{color:#333;font-weight:600}
+.gold-table-pairs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 16px;align-items:start}
+.gold-entry-block{min-width:0;border:1px solid #e0e0e0;border-radius:8px;background:#fff;overflow:hidden}
+.gold-entry-title{height:44px;display:flex;align-items:center;padding:0 12px;font-size:15px;font-weight:600;color:#333;border-bottom:1px solid #f0f0f0}
+.gold-grid-head,.gold-grid-row,.gold-grid-footer{display:grid;gap:8px;align-items:center;padding:0 12px;min-width:0}
+.gold-grid-head{height:38px;background:#f9f9f9;border-bottom:1px solid #f0f0f0;color:#383838;font-size:11px;font-weight:600}
+.gold-grid-row{height:40px;border-bottom:1px solid #f0f0f0;color:#383838;font-size:13px}
+.gold-grid-row>strong{font-size:13px;font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.gold-grid-row>.ant-select,.gold-grid-row>.ant-input,.gold-grid-row>.ant-btn,.gold-grid-row>.ant-input-number{width:100%;min-width:0;height:30px;border-radius:4px;border-color:#cfcfcf;box-shadow:none;font-size:12px}
+.gold-grid-row>.ant-btn.gold-custom-choice{justify-content:flex-start;text-align:left;color:#383838;padding-left:6px}
+.gold-grid-row .ant-select-selector{border-color:#cfcfcf!important;height:30px!important;font-size:12px;box-shadow:none!important}
+.gold-grid-row .ant-select-selection-item{text-align:left}
+.gold-grid-row .ant-input-number-input{height:28px;text-align:right;padding:0 6px;font-size:13px;font-variant-numeric:tabular-nums}
+.gold-grid-row .ant-input{padding:2px 6px;font-size:12px}
+.gold-weight-preset{text-align:right;font-size:13px;font-weight:500;color:#383838;font-variant-numeric:tabular-nums}
+.gold-align-right{text-align:right!important}
+.gold-add-row{height:30px;display:flex;align-items:center;gap:5px;cursor:pointer;border:0;background:#fff;color:#383838;padding:0 12px;font-size:11px;width:100%;text-align:left}
+.gold-add-row:hover{background:#f7f9fc;color:#1677ff}
+.gold-add-row .anticon{font-size:11px}
+.gold-grid-footer{height:40px;background:#f5f5f5;color:#333;font-size:12px;font-weight:600}
+.gold-grid-footer strong{white-space:nowrap}
+.gold-day-summary{position:sticky;top:16px;align-self:start;min-width:0;border:1px solid #e5e9f0;border-radius:8px;background:#fff;padding:16px;max-height:none;overflow:visible}
+.gold-day-summary h2{font-size:16px;font-weight:600;color:#172b4d;margin:0 0 16px}
+.gold-day-summary h3{font-size:11px;font-weight:600;color:#667085;margin:15px 0 8px}
+.gold-summary-items{display:flex;flex-direction:column;gap:0}
+.gold-summary-item{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:40px;font-size:11px;color:#667085}
+.gold-summary-item strong{font-size:12px;font-weight:500;color:#172b4d;white-space:nowrap}
+.gold-summary-separator{height:2px;background:#d0d5dd;margin:10px 0}
+.gold-summary-main{font-size:28px;line-height:40px;font-weight:600;color:#172b4d;text-align:right;white-space:nowrap}
+.gold-summary-difference{font-size:30px;font-weight:650;text-align:right;color:#1f1f1f}
+.gold-summary-difference.is-alert{color:#e53935}
+.gold-summary-state{text-align:right;font-size:12px;color:#172b4d;margin:3px 0 12px}
+.gold-summary-info{font-size:11px;color:#667085;margin:12px 0 16px}
+.gold-custom-fields{display:grid;gap:16px}
+.gold-custom-fields label{display:grid;grid-template-columns:190px 1fr;align-items:center;gap:12px;font-size:13px}
+@media(max-width:1250px){.gold-page-layout{grid-template-columns:minmax(0,1fr) 260px}.gold-workers-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.gold-table-pairs{grid-template-columns:1fr}}
+@media(max-width:800px){.gold-page-layout{display:flex;flex-direction:column}.gold-main-sheet,.gold-day-summary{width:100%}.gold-day-summary{position:static;max-height:none;overflow:visible}.gold-table-pairs{grid-template-columns:repeat(2,minmax(0,1fr))}.gold-page-heading{align-items:flex-start;flex-direction:column}}
+@media(max-width:650px){.gold-workers-grid,.gold-table-pairs{grid-template-columns:1fr}.gold-debt-card{grid-template-columns:1fr auto}.gold-debt-card>b{order:3;grid-column:1/-1;text-align:center}.gold-custom-fields label{grid-template-columns:1fr}}
+
+/* Align the customer debt amount with the worker total, both on the right edge. */
+.gold-debt-card{grid-template-columns:minmax(0,1fr) auto;min-height:68px}
+.gold-debt-amount{display:flex;align-items:flex-end;flex-direction:column;justify-content:center;min-width:170px;gap:0}
+.gold-debt-amount b{color:#172b4d;font-size:21px;font-weight:700;line-height:27px;white-space:nowrap}
+.gold-debt-amount .ant-btn{font-size:10px;line-height:15px;height:19px;padding:0;color:#1677ff}
+.gold-workers-heading{padding-right:4px}
+.gold-setup-section{border-top:1px solid #edf0f3;padding:14px 0;display:flex;flex-direction:column;gap:9px}
+.gold-setup-section>strong,.gold-setup-scope>strong{font-size:14px;color:#172b4d}
+.gold-setup-section .ant-typography-secondary,.gold-setup-scope .ant-typography-secondary{font-size:12px}
+.gold-setup-head,.gold-setup-row{display:grid;grid-template-columns:minmax(0,1fr) 200px 32px;gap:8px;align-items:center}
+.gold-setup-head{color:#667085;font-size:11px}
+.gold-setup-row .ant-input-number{width:100%;height:24px}
+.gold-setup-row .ant-input-number-input{height:22px;text-align:right}
+.gold-setup-section>.ant-btn{align-self:flex-start;padding-left:0}
+.gold-setup-chips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.gold-setup-weight{min-width:0}
+.gold-setup-weight .ant-input-number{flex:1;min-width:0;height:24px}
+.gold-setup-weight .ant-input-number-input{height:22px;text-align:right}
+.gold-setup-scope{background:#f7f9fc;border-radius:7px;padding:14px;display:flex;flex-direction:column;gap:10px;margin-top:9px}
+.gold-custom-input{width:100%;min-height:30px;border:1px solid #cfcfcf;border-radius:4px;padding:4px 8px}
+@media(max-width:650px){.gold-debt-card{grid-template-columns:minmax(0,1fr) auto}.gold-debt-amount{min-width:0}.gold-setup-chips{grid-template-columns:repeat(2,minmax(0,1fr))}.gold-setup-head,.gold-setup-row{grid-template-columns:minmax(0,1fr) 120px 28px}}
+
+/* Per-worker work selection, preserving four-column Figma sheet. */
+.gold-worker-header .gold-worker-add{padding:0 5px;height:27px;color:#1677ff;font-size:10px;font-weight:500}
+.gold-worker-header .gold-worker-add .anticon{font-size:10px}
+.gold-worker-work-name{display:flex;align-items:center;gap:2px;min-width:0;width:100%}
+.gold-worker-work-text{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gold-worker-sheet .gold-worker-remove{flex:0 0 auto;width:19px;height:22px;min-width:19px;padding:0;color:#98a2b3;opacity:.7}
+.gold-worker-sheet .gold-worker-remove:hover{color:#cf1322;background:#fff1f0;opacity:1}
+.gold-worker-sheet .gold-worker-remove .anticon{font-size:9px}
+.gold-work-picker-meta{font-size:12px;color:#667085;margin:13px 0 8px}
+.gold-work-picker-list{max-height:390px;overflow-y:auto;border:1px solid #e5e9ef;border-radius:6px}
+.gold-work-picker-row{display:grid;grid-template-columns:22px minmax(0,1fr) 105px 105px;align-items:center;gap:9px;min-height:48px;padding:8px 12px;cursor:pointer;border-bottom:1px solid #edf0f4;background:#fff;color:#667085;font-size:12px}
+.gold-work-picker-row:last-child{border-bottom:0}
+.gold-work-picker-row:hover{background:#f6f9ff}
+.gold-work-picker-row.is-selected{background:#eaf3ff;color:#172b4d;font-weight:600}
+.gold-work-picker-row.is-selected:hover{background:#dcecff}
+.gold-work-picker-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gold-work-picker-weight{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.gold-work-picker-hint{display:block;margin-top:12px;font-size:11px}
+@media(max-width:600px){.gold-work-picker-row{grid-template-columns:20px minmax(0,1fr);gap:6px}.gold-work-picker-weight{display:none}}
+
+/* Worker picker: date, work, Giao, Nhận, Hao/Heo. */
+.gold-worker-work-name{gap:1px}
+.gold-worker-sheet .gold-worker-remove{margin-left:-6px;margin-right:1px}
+.gold-work-picker-columns,.gold-work-picker-row{display:grid;grid-template-columns:22px 98px minmax(135px,1fr) 76px 76px 90px;gap:9px;align-items:center;min-width:635px}
+.gold-work-picker-columns{padding:11px 12px;background:#f9f9f9;border-bottom:1px solid #e5e9ef;color:#667085;font-size:10px;font-weight:600;white-space:nowrap}
+.gold-work-picker-columns span:nth-child(n+4){text-align:right}
+.gold-work-picker-date{font-size:11px;color:inherit;white-space:nowrap}
+.gold-work-picker-row{min-height:46px}
+.gold-work-picker-weight{font-size:12px;display:block}
+.gold-work-picker-list{overflow:auto}
+
+.gold-no-workers{padding:18px 12px;color:#667085;font-size:12px}
+.gold-add-row:disabled{cursor:not-allowed;opacity:.45}

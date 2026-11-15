@@ -1,0 +1,19 @@
+.gold-sessions-page{width:100%;min-width:0;padding:0 0 30px;color:#172b4d}
+.gold-sessions-title{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px}
+.gold-sessions-title h3.ant-typography{margin:0 0 3px;font-size:24px;color:#172b4d}
+.gold-sessions-title .ant-typography-secondary{font-size:13px}
+.gold-sessions-filter{background:#fff;border:1px solid #e5e9f0;border-radius:8px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.gold-sessions-month{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.gold-sessions-month>.anticon{color:#667085;margin-right:5px}
+.gold-sessions-month input[type=month]{height:30px;padding:0 8px;border:1px solid #d9d9d9;border-radius:6px;color:#172b4d;background:#fff;font-size:12px}
+.gold-sessions-table{background:#fff;border:1px solid #e5e9f0;border-radius:8px;overflow:hidden}
+.gold-sessions-table-heading{min-height:52px;padding:13px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid #eef0f4}
+.gold-sessions-table-heading strong{font-size:15px}
+.gold-sessions-table-heading span{font-size:12px;color:#667085}
+.gold-sessions-table .ant-table-thead>tr>th{background:#fafafa;color:#667085;font-size:12px;font-weight:600}
+.gold-sessions-table .ant-table-tbody>tr>td{font-size:12px}
+.gold-sessions-table .ant-table-wrapper .ant-table{border-radius:0}
+.gold-sessions-table .ant-empty{padding:24px 4px}
+.gold-sessions-table .ant-empty-description{font-size:13px;line-height:1.7}
+.gold-sessions-preview-note{font-size:12px;color:#667085;margin-top:13px}
+@media(max-width:700px){.gold-sessions-title{align-items:flex-start;flex-direction:column}.gold-sessions-filter{align-items:flex-start;flex-direction:column}}

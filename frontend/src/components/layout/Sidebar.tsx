@@ -18,7 +18,7 @@ export function Sidebar({ active, onChange, profile, onLogout }: { active: PageK
     { key: 'ledger' as const, label: 'Sổ giao dịch khách hàng', icon: <BookOutlined /> },
     { label: 'Sổ lương thợ', icon: <DollarOutlined /> },
     { label: 'Kho vật dụng', icon: <DatabaseOutlined /> },
-    { label: 'Vàng', icon: <DollarOutlined /> },
+    { key: 'gold' as const, label: 'Vàng', icon: <DollarOutlined /> },
     { key: 'cash' as const, label: 'Thu / Chi', icon: <DollarOutlined /> },
     { label: 'Báo cáo', icon: <MenuFoldOutlined /> },
     { type: 'label', label: 'DANH BẠ' },
@@ -36,7 +36,7 @@ export function Sidebar({ active, onChange, profile, onLogout }: { active: PageK
         <div><strong>QUẢN LÝ XƯỞNG</strong><span>Vận hành tinh gọn</span></div>
       </div>
       <nav className="nav-list">
-        {items.filter(item => !item.key || can(({employees:'employees.read',customers:'customers.read',ledger:'customer_ledger.read',accounts:'users.read',orders:'orders.read',deliveries:'delivery.manage',cash:'cash.read','design-models':'design_models.read',components:'components.read','production-batches':'production.read'})[item.key])).map((item, index) =>
+        {items.filter(item => !item.key || can(({employees:'employees.read',customers:'customers.read',ledger:'customer_ledger.read',accounts:'users.read',orders:'orders.read',deliveries:'delivery.manage',cash:'cash.read','design-models':'design_models.read',components:'components.read','production-batches':'production.read',gold:'gold.sessions.read'})[item.key])).map((item, index) =>
           item.type === 'label' ? (
             <div className="nav-label" key={`${item.label}-${index}`}>{item.label}</div>
           ) : (

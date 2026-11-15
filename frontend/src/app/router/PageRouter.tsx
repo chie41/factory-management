@@ -1,3 +1,5 @@
+import { GoldDailyPreview } from '../../features/gold/GoldDailyPreview'
+import { GoldSessionsPage } from '../../features/gold/GoldSessionsPage'
 import { CatalogPage } from '../../pages/CatalogPage'
 import { ProductionBatchesPage } from '../../pages/ProductionBatchesPage'
 import { BatchCreatePage } from '../../features/production/BatchCreate'
@@ -14,8 +16,10 @@ import { CustomersPage } from '../../pages/CustomersPage'
 import { LedgerPage } from '../../pages/LedgerPage'
 export function PageRouter() {
   const { can } = usePermissions()
-  const home = can('employees.read') ? '/employees' : can('customers.read') ? '/customers' : can('customer_ledger.read') ? '/ledger' : can('users.read') ? '/system/accounts' : can('orders.read') ? '/orders' : can('delivery.manage') ? '/deliveries' : can('cash.read') ? '/cash' : can('design_models.read') ? '/design-models' : can('components.read') ? '/components' : can('production.read') ? '/production-batches' : '/employees'
+  const home = can('employees.read') ? '/employees' : can('customers.read') ? '/customers' : can('customer_ledger.read') ? '/ledger' : can('users.read') ? '/system/accounts' : can('orders.read') ? '/orders' : can('delivery.manage') ? '/deliveries' : can('cash.read') ? '/cash' : can('design_models.read') ? '/design-models' : can('components.read') ? '/components' : can('production.read') ? '/production-batches' : can('gold.sessions.read') ? '/gold' : '/employees'
   return <Routes>
+    <Route path="/gold" element={<PermissionRoute permission="gold.sessions.read"><GoldSessionsPage /></PermissionRoute>} />
+    <Route path="/gold/daily/:date" element={<PermissionRoute permission="gold.sessions.read"><GoldDailyPreview /></PermissionRoute>} />
     <Route path="/production-batches/new" element={<PermissionRoute permission="production.create"><PermissionRoute permission="design_models.read"><BatchCreatePage /></PermissionRoute></PermissionRoute>} />
     <Route path="/production-batches" element={<PermissionRoute permission="production.read"><ProductionBatchesPage /></PermissionRoute>} />
     <Route path="/production-batches/:id" element={<PermissionRoute permission="production.read"><ProductionBatchDetailPage /></PermissionRoute>} />
