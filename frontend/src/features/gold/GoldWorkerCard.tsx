@@ -6,10 +6,11 @@ import { formatGold, numberOrNull, sumGold } from './GoldDailyTables'
 export type GoldWork = { id: string; title: string; workDate: string; issued: string; returned?: string }
 export type GoldWorker = { id: string; name: string; jobs: GoldWork[] }
 
-export function GoldWorkerCard({ worker, onPick, onRemove }: {
+export function GoldWorkerCard({ worker, onPick, onRemove, disabled=false }: {
   worker: GoldWorker
   onPick: () => void
   onRemove: (workId: string) => void
+  disabled?: boolean
 }) {
   const issued = sumGold(worker.jobs.map(job => numberOrNull(job.issued)))
   const returned = sumGold(worker.jobs.map(job => numberOrNull(job.returned)))
@@ -18,7 +19,7 @@ export function GoldWorkerCard({ worker, onPick, onRemove }: {
   return <section className="gold-worker">
     <header className="gold-worker-header">
       <strong>{worker.name}</strong>
-      <Button className="gold-worker-add" size="small" type="text" icon={<PlusOutlined />} onClick={onPick}>Chọn công việc</Button>
+      <Button className="gold-worker-add" size="small" type="text" icon={<PlusOutlined />} disabled={disabled} onClick={onPick}>Chọn công việc</Button>
     </header>
     <table className="gold-worker-sheet">
       <colgroup>
@@ -32,7 +33,7 @@ export function GoldWorkerCard({ worker, onPick, onRemove }: {
           <td title={job?.title ?? ''}>
             {job ? <span className="gold-worker-work-name">
               <Tooltip title="Loại khỏi phiên tịnh vàng (không xóa giao việc)">
-                <Button type="text" size="small" className="gold-worker-remove" aria-label={'Bỏ công việc '+job.title} icon={<CloseOutlined />} onClick={()=>onRemove(job.id)} />
+                <Button type="text" size="small" className="gold-worker-remove" disabled={disabled} aria-label={'Bỏ công việc '+job.title} icon={<CloseOutlined />} onClick={()=>onRemove(job.id)} />
               </Tooltip>
               <span className="gold-worker-work-text">{job.title}</span>
             </span> : ''}
