@@ -18,7 +18,7 @@ export function Sidebar({ active, onChange, profile, onLogout }: { active: PageK
     { key: 'ledger' as const, label: 'Sổ giao dịch khách hàng', icon: <BookOutlined /> },
     { label: 'Sổ lương thợ', icon: <DollarOutlined /> },
     { label: 'Kho vật dụng', icon: <DatabaseOutlined /> },
-    { key: 'gold' as const, label: 'Vàng (UI xem trước)', icon: <DollarOutlined /> },
+    { key: 'gold' as const, label: 'Vàng', icon: <DollarOutlined /> },
     { key: 'cash' as const, label: 'Thu / Chi', icon: <DollarOutlined /> },
     { label: 'Báo cáo', icon: <MenuFoldOutlined /> },
     { type: 'label', label: 'DANH BẠ' },
