@@ -17,20 +17,21 @@ export function formatGold(value: number | null, suffix = ''): string {
 export function sumGold(values: Array<number | null>): number {
   return values.reduce<number>((sum, n) => sum + (n ?? 0), 0)
 }
-export function GoldInput({ value, onChange, placeholder = '', integer = false }: {
+export function GoldInput({ value, onChange, placeholder = '', integer = false, disabled=false }: {
   value: string
   onChange: (value: string) => void
   placeholder?: string
   integer?: boolean
+  disabled?: boolean
 }) {
   return <InputNumber<string> aria-label={integer ? 'Số lượng' : 'Trọng lượng'}
-    className="gold-field" size="small" stringMode controls={false} min="0" precision={integer ? 0 : 2}
+    className="gold-field" size="small" stringMode controls={false} disabled={disabled} min="0" precision={integer ? 0 : 2}
     value={value || null} placeholder={placeholder}
     formatter={(current, info) => info.userTyping ? info.input : current == null || current === '' ? '' : Number(current).toLocaleString('en-US', { minimumFractionDigits: integer ? 0 : 2, maximumFractionDigits: integer ? 0 : 2 })}
     parser={text => (text ?? '').replaceAll(',', '')}
     onChange={next => onChange(next ?? '')} />
 }
-function EntryBlock({ title, cols, headers, children, onAdd, footerLabel, totals }: {
+function EntryBlock({ title, cols, headers, children, onAdd, footerLabel, totals, disabled=false }: {
   title: string
   cols: string
   headers: string[]
@@ -38,12 +39,13 @@ function EntryBlock({ title, cols, headers, children, onAdd, footerLabel, totals
   onAdd: () => void
   footerLabel: string
   totals: Array<string>
+  disabled?: boolean
 }) {
   return <section className="gold-entry-block">
     <div className="gold-entry-title">{title}</div>
     <div className="gold-grid-head" style={{ gridTemplateColumns: cols }}>{headers.map((head, i) => <span key={head} className={i ? 'gold-align-right' : ''}>{head}</span>)}</div>
     <div className="gold-grid-body">{children}</div>
-    <button className="gold-add-row" type="button" onClick={onAdd}><PlusOutlined /> Thêm dòng</button>
+    <button className="gold-add-row" type="button" disabled={disabled} onClick={onAdd}><PlusOutlined /> Thêm dòng</button>
     <div className="gold-grid-footer" style={{ gridTemplateColumns: cols }}>
       <strong>{footerLabel}</strong>{totals.map((text, i) => <strong className="gold-align-right" key={i}>{text}</strong>)}
     </div>
@@ -58,6 +60,7 @@ export function GoldScaleTable({ rows, boxes, onChange, onAdd }: {
   boxes: GoldBox[]
   onChange: (index: number, key: keyof GoldScaleRow, value: string) => void
   onAdd: () => void
+  disabled?: boolean
 }) {
   const options = [{ value: NO_BOX_ID, label: 'Không hộp · 0g' }, ...boxes.map(box => ({ value: box.id, label: box.name + ' · ' + box.tareG + 'g' }))]
   const tare = (boxId: string) => boxId === NO_BOX_ID ? 0 : numberOrNull(boxes.find(box => box.id === boxId)?.tareG) ?? null
@@ -67,13 +70,13 @@ export function GoldScaleTable({ rows, boxes, onChange, onAdd }: {
     return gross == null || boxTare == null ? null : gross - boxTare
   }
   const total = sumGold(rows.map(netValue))
-  return <EntryBlock title="Vàng cân hiện tại" cols={scaleColumns} headers={['HỘP', 'SỐ CÂN', 'VÀNG THỰC']} onAdd={onAdd} footerLabel="TỔNG CÂN" totals={['',formatGold(total)]}>
+  return <EntryBlock disabled={disabled} title="Vàng cân hiện tại" cols={scaleColumns} headers={['HỘP', 'SỐ CÂN', 'VÀNG THỰC']} onAdd={onAdd} footerLabel="TỔNG CÂN" totals={['',formatGold(total)]}>
     {rows.map((row, i) => {
       const net = netValue(row)
       return <div className="gold-grid-row" style={{ gridTemplateColumns: scaleColumns }} key={i}>
-        <Select aria-label="Hộp" size="small" className="gold-box-select" placeholder="Chọn hộp..." options={options}
+        <Select aria-label="Hộp" size="small" className="gold-box-select" disabled={disabled} placeholder="Chọn hộp..." options={options}
           value={row.box || undefined} onChange={v => onChange(i,'box',v)} />
-        <GoldInput value={row.gross} onChange={v => onChange(i,'gross',v)} />
+        <GoldInput disabled={disabled} value={row.gross} onChange={v => onChange(i,'gross',v)} />
         <strong className="gold-align-right">{formatGold(net)}</strong>
       </div>
     })}
@@ -83,12 +86,13 @@ export function GoldBagsTable({ rows, onChange, onAdd }: {
   rows: GoldAmountRow[]
   onChange: (index: number, key: keyof GoldAmountRow, value: string) => void
   onAdd: () => void
+  disabled?: boolean
 }) {
   const total = sumGold(rows.map(row => row.count === '' || row.unit === '' ? null : (numberOrNull(row.unit) ?? 0) * (numberOrNull(row.count) ?? 0)))
-  return <EntryBlock title="Túi bóng / bao bóng" cols={amountColumns} headers={['TRỌNG LƯỢNG','SL','TỔNG']} onAdd={onAdd} footerLabel="TỔNG TÚI BÓNG" totals={['',formatGold(total)]}>
+  return <EntryBlock disabled={disabled} title="Túi bóng / bao bóng" cols={amountColumns} headers={['TRỌNG LƯỢNG','SL','TỔNG']} onAdd={onAdd} footerLabel="TỔNG TÚI BÓNG" totals={['',formatGold(total)]}>
     {rows.map((row,i) => <div className="gold-grid-row" style={{ gridTemplateColumns: amountColumns }} key={i}>
-      <GoldInput value={row.unit} onChange={v => onChange(i, 'unit', v)} />
-      <GoldInput value={row.count} onChange={v => onChange(i,'count',v)} integer />
+      <GoldInput disabled={disabled} value={row.unit} onChange={v => onChange(i, 'unit', v)} />
+      <GoldInput disabled={disabled} value={row.count} onChange={v => onChange(i,'count',v)} integer />
       <strong className="gold-align-right">{row.count && row.unit ? formatGold((numberOrNull(row.unit) ?? 0) * (numberOrNull(row.count) ?? 0)) : '—'}</strong>
     </div>)}
   </EntryBlock>
@@ -97,12 +101,13 @@ export function GoldLabelsTable({ rows, onChange, onAdd }: {
   rows: GoldAmountRow[]
   onChange: (index: number, key: keyof GoldAmountRow, value: string) => void
   onAdd: () => void
+  disabled?: boolean
 }) {
   const total = sumGold(rows.map(row => row.count === '' || row.unit === '' ? null : (numberOrNull(row.unit) ?? 0) * (numberOrNull(row.count) ?? 0)))
-  return <EntryBlock title="Nhãn đá / vật liệu phụ" cols={amountColumns} headers={['TRỌNG LƯỢNG','SL','TỔNG']} onAdd={onAdd} footerLabel="TỔNG NHÃN ĐÁ" totals={['',formatGold(total)]}>
+  return <EntryBlock disabled={disabled} title="Nhãn đá / vật liệu phụ" cols={amountColumns} headers={['TRỌNG LƯỢNG','SL','TỔNG']} onAdd={onAdd} footerLabel="TỔNG NHÃN ĐÁ" totals={['',formatGold(total)]}>
     {rows.map((row,i) => <div className="gold-grid-row" style={{ gridTemplateColumns: amountColumns }} key={i}>
-      <GoldInput value={row.unit} onChange={v => onChange(i,'unit',v)} />
-      <GoldInput value={row.count} onChange={v => onChange(i,'count',v)} integer />
+      <GoldInput disabled={disabled} value={row.unit} onChange={v => onChange(i,'unit',v)} />
+      <GoldInput disabled={disabled} value={row.count} onChange={v => onChange(i,'count',v)} integer />
       <strong className="gold-align-right">{row.count && row.unit ? formatGold((numberOrNull(row.unit) ?? 0) * (numberOrNull(row.count) ?? 0)) : '—'}</strong>
     </div>)}
   </EntryBlock>
@@ -111,14 +116,15 @@ export function GoldOtherTable({ rows, onChange, onAdd }: {
   rows: GoldOtherRow[]
   onChange: (index: number, key: keyof GoldOtherRow, value: string) => void
   onAdd: () => void
+  disabled?: boolean
 }) {
   const plus = sumGold(rows.map(r => numberOrNull(r.add)))
   const minus = sumGold(rows.map(r => numberOrNull(r.subtract)))
-  return <EntryBlock title="Các yếu tố khác" cols={otherColumns} headers={['NỘI DUNG','CỘNG','TRỪ']} onAdd={onAdd} footerLabel="TỔNG" totals={[formatGold(plus),formatGold(minus)]}>
+  return <EntryBlock disabled={disabled} title="Các yếu tố khác" cols={otherColumns} headers={['NỘI DUNG','CỘNG','TRỪ']} onAdd={onAdd} footerLabel="TỔNG" totals={[formatGold(plus),formatGold(minus)]}>
     {rows.map((row,i) => <div className="gold-grid-row" style={{ gridTemplateColumns: otherColumns }} key={i}>
-      <Input aria-label="Nội dung" size="small" placeholder="Nhập nội dung..." value={row.name} onChange={e => onChange(i,'name',e.target.value)} />
-      <GoldInput value={row.add} onChange={v => onChange(i,'add',v)} />
-      <GoldInput value={row.subtract} onChange={v => onChange(i,'subtract',v)} />
+      <Input aria-label="Nội dung" size="small" disabled={disabled} placeholder="Nhập nội dung..." value={row.name} onChange={e => onChange(i,'name',e.target.value)} />
+      <GoldInput disabled={disabled} value={row.add} onChange={v => onChange(i,'add',v)} />
+      <GoldInput disabled={disabled} value={row.subtract} onChange={v => onChange(i,'subtract',v)} />
     </div>)}
   </EntryBlock>
 }
