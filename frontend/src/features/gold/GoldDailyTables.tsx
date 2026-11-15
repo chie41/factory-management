@@ -1,6 +1,5 @@
 import { Button, Input, InputNumber, Select } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
-import { fixedDecimalText } from '../../utils/decimal'
 
 export type GoldScaleRow = { box: string; gross: string }
 export type GoldAmountRow = { name: string; unit: string; count: string }
@@ -12,7 +11,7 @@ export function numberOrNull(value?: string | null): number | null {
   return Number.isFinite(numeric) ? numeric : null
 }
 export function formatGold(value: number | null, suffix = ''): string {
-  return value == null ? '—' : fixedDecimalText(value.toFixed(2), 2) + suffix
+  return value == null ? '—' : value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + suffix
 }
 export function sumGold(values: Array<number | null>): number {
   return values.reduce<number>((sum, n) => sum + (n ?? 0), 0)
@@ -25,7 +24,10 @@ export function GoldInput({ value, onChange, placeholder = '', integer = false }
 }) {
   return <InputNumber<string> aria-label={integer ? 'Số lượng' : 'Trọng lượng'}
     className="gold-field" size="small" stringMode controls={false} min="0" precision={integer ? 0 : 2}
-    value={value || null} placeholder={placeholder} onChange={next => onChange(next ?? '')} />
+    value={value || null} placeholder={placeholder}
+    formatter={(current, info) => info.userTyping ? info.input : current == null || current === '' ? '' : Number(current).toLocaleString('en-US', { minimumFractionDigits: integer ? 0 : 2, maximumFractionDigits: integer ? 0 : 2 })}
+    parser={text => (text ?? '').replaceAll(',', '')}
+    onChange={next => onChange(next ?? '')} />
 }
 function EntryBlock({ title, cols, headers, children, onAdd, footerLabel, totals }: {
   title: string
