@@ -89,3 +89,23 @@
 .gold-setup-scope{background:#f7f9fc;border-radius:7px;padding:14px;display:flex;flex-direction:column;gap:10px;margin-top:9px}
 .gold-custom-input{width:100%;min-height:30px;border:1px solid #cfcfcf;border-radius:4px;padding:4px 8px}
 @media(max-width:650px){.gold-debt-card{grid-template-columns:minmax(0,1fr) auto}.gold-debt-amount{min-width:0}.gold-setup-chips{grid-template-columns:repeat(2,minmax(0,1fr))}.gold-setup-head,.gold-setup-row{grid-template-columns:minmax(0,1fr) 120px 28px}}
+
+/* Per-worker work selection, preserving four-column Figma sheet. */
+.gold-worker-header .gold-worker-add{padding:0 5px;height:27px;color:#1677ff;font-size:10px;font-weight:500}
+.gold-worker-header .gold-worker-add .anticon{font-size:10px}
+.gold-worker-work-name{display:flex;align-items:center;gap:2px;min-width:0;width:100%}
+.gold-worker-work-text{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gold-worker-sheet .gold-worker-remove{flex:0 0 auto;width:19px;height:22px;min-width:19px;padding:0;color:#98a2b3;opacity:.7}
+.gold-worker-sheet .gold-worker-remove:hover{color:#cf1322;background:#fff1f0;opacity:1}
+.gold-worker-sheet .gold-worker-remove .anticon{font-size:9px}
+.gold-work-picker-meta{font-size:12px;color:#667085;margin:13px 0 8px}
+.gold-work-picker-list{max-height:390px;overflow-y:auto;border:1px solid #e5e9ef;border-radius:6px}
+.gold-work-picker-row{display:grid;grid-template-columns:22px minmax(0,1fr) 105px 105px;align-items:center;gap:9px;min-height:48px;padding:8px 12px;cursor:pointer;border-bottom:1px solid #edf0f4;background:#fff;color:#667085;font-size:12px}
+.gold-work-picker-row:last-child{border-bottom:0}
+.gold-work-picker-row:hover{background:#f6f9ff}
+.gold-work-picker-row.is-selected{background:#eaf3ff;color:#172b4d;font-weight:600}
+.gold-work-picker-row.is-selected:hover{background:#dcecff}
+.gold-work-picker-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gold-work-picker-weight{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.gold-work-picker-hint{display:block;margin-top:12px;font-size:11px}
+@media(max-width:600px){.gold-work-picker-row{grid-template-columns:20px minmax(0,1fr);gap:6px}.gold-work-picker-weight{display:none}}
