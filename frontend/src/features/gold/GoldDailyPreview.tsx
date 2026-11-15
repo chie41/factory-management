@@ -96,6 +96,7 @@ export function GoldDailyPreview() {
   const [settingsOpen,setSettingsOpen] = useState(false)
   const [debtOpen,setDebtOpen] = useState(false)
   const [pickerWorkerId,setPickerWorkerId] = useState<string | null>(null)
+  const [pendingRemove,setPendingRemove] = useState<{workerId:string;workId:string} | null>(null)
   useEffect(() => {
     if (routeDate && /^\d{4}-\d{2}-\d{2}$/.test(routeDate) && routeDate !== date) {
       setOpenedDays(prev=>({...prev,[date]:data}))
@@ -123,7 +124,14 @@ export function GoldDailyPreview() {
     setData(prev=>applyLayout(prev,next))
     setSettingsOpen(false)
   }
-  const removeWork = (workerId:string,workId:string) => setData(prev=>({...prev,workers:prev.workers.map(w=>w.id===workerId?{...w,jobs:w.jobs.filter(job=>job.id!==workId)}:w)}))
+  const confirmRemoveWork = () => {
+    if (!pendingRemove) return
+    const {workerId,workId} = pendingRemove
+    setData(prev=>({...prev,workers:prev.workers.map(w=>w.id===workerId?{...w,jobs:w.jobs.filter(job=>job.id!==workId)}:w)}))
+    setPendingRemove(null)
+  }
+  const pendingWorker = data.workers.find(w=>w.id===pendingRemove?.workerId)
+  const pendingJob = pendingWorker?.jobs.find(job=>job.id===pendingRemove?.workId)
   const applyWorks = (workerId:string,ids:string[]) => {
     setData(prev=>{
       const selected=new Set(ids)
@@ -173,7 +181,7 @@ export function GoldDailyPreview() {
         </div>
         <section className="gold-workers-section">
           <div className="gold-workers-heading"><h2>THỢ</h2><div><span>TỔNG GIAO THỢ</span><strong>{formatGold(workerBalance,' g')}</strong></div></div>
-          <div className="gold-workers-grid">{data.workers.map(w=><GoldWorkerCard key={w.id} worker={w} onPick={()=>setPickerWorkerId(w.id)} onRemove={workId=>removeWork(w.id,workId)}/>)}</div>
+          <div className="gold-workers-grid">{data.workers.map(w=><GoldWorkerCard key={w.id} worker={w} onPick={()=>setPickerWorkerId(w.id)} onRemove={workId=>setPendingRemove({workerId:w.id,workId})}/>)}</div>
         </section>
         <div className="gold-table-pairs">
           <GoldScaleTable rows={data.scales} boxes={data.layout.boxes} onChange={updateScale} onAdd={()=>setData(p=>({...p,scales:[...p.scales,{box:'',gross:''}]}))}/>
@@ -187,6 +195,13 @@ export function GoldDailyPreview() {
       </div>
       <GoldDaySummary workerBalance={workerBalance} scale={scale} debt={numberOrNull(data.debt)??0} bags={bags} labels={labels} plus={plus} minus={minus} previous={numberOrNull(data.previous)}/>
     </div>
+    <Modal title="Xác nhận bỏ công việc" open={pendingRemove!==null}
+      okText="Bỏ công việc" okButtonProps={{danger:true}}
+      cancelText="Hủy" onCancel={()=>setPendingRemove(null)} onOk={confirmRemoveWork}
+      destroyOnHidden>
+      <p>Bạn có chắc muốn bỏ <strong>{pendingJob?.title ?? 'công việc này'}</strong> khỏi bảng Tịnh vàng của thợ <strong>{pendingWorker?.name ?? ''}</strong>?</p>
+      <p>Thao tác này chỉ loại công việc khỏi phiên Tịnh vàng đang xem, <strong>không xóa công việc hoặc dữ liệu giao nhận trong Sản xuất</strong>. Tổng giao thợ và Tổng kết ngày sẽ được tính lại.</p>
+    </Modal>
     <GoldWorkPicker worker={pickerWorker} available={pickerWorkerId ? (data.availableWorks[pickerWorkerId] ?? []) : []}
       open={pickerWorkerId!==null} onCancel={()=>setPickerWorkerId(null)} onApply={applyWorks}/>
     <GoldLayoutSettings open={settingsOpen} date={date} initial={data.layout} allowFuture={canManageDefaults} onCancel={()=>setSettingsOpen(false)} onSave={saveLayout}/>
