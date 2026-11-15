@@ -88,7 +88,7 @@ export function GoldSessionsPage() {
         <Typography.Title level={3}>Phiên tịnh vàng</Typography.Title>
         <Typography.Text type="secondary">Danh sách và lịch sử các phiên tịnh vàng hằng ngày · Dữ liệu minh họa</Typography.Text>
       </div>
-      <Button type="primary" onClick={() => navigate('/gold/daily/' + isoLocalDate(new Date()))}>Mở trang tịnh vàng</Button>
+      <Button type="primary" onClick={() => navigate('/gold/daily/' + isoLocalDate(new Date()))}>Tạo phiên tịnh vàng mới</Button>
     </div>
     <div className="gold-sessions-filter">
       <div className="gold-sessions-month">
