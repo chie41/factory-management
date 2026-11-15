@@ -326,7 +326,7 @@ export function GoldDailyPreview() {
         <section className="gold-workers-section">
           <div className="gold-workers-heading"><h2>THỢ</h2><div><span>TỔNG GIAO THỢ</span><strong>{formatGold(workerBalance,' g')}</strong></div></div>
           <div className="gold-workers-grid">{data.workers.map(w=><GoldWorkerCard key={w.id} worker={w} disabled={!isEditable} onPick={()=>setPickerWorkerId(w.id)} onRemove={workId=>setPendingRemove({workerId:w.id,workId})}/>)}</div>
-          {data.workers.length===0 && <div className="gold-no-workers">Chưa có công việc thợ trong snapshot của phiên này.</div>
+          {data.workers.length===0 && <div className="gold-no-workers">Chưa có công việc thợ trong snapshot của phiên này.</div>}
         </section>
         <div className="gold-table-pairs">
           <GoldScaleTable rows={data.scales} boxes={data.layout.boxes} disabled={!isEditable} onChange={updateScale} onAdd={()=>setData(p=>({...p,scales:[...p.scales,{box:'',gross:''}]}))}/>
