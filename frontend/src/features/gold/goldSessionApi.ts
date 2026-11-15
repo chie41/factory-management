@@ -5,8 +5,10 @@ import type { GoldLayoutTemplate } from './goldLayoutTemplate'
 
 export type GoldSessionStatus = 'DRAFT'|'FINALIZED'|'LOCKED'|'REOPENED'
 export type GoldManual = { scales:GoldScaleRow[];bags:GoldAmountRow[];labels:GoldAmountRow[];others:GoldOtherRow[] }
+export type GoldCustomerDebt = {customerId:string;customerCode:string;customerName:string;closingGoldG:string}
 export type GoldSessionSource = {
  workers:GoldWorker[]
+ customerDebts:GoldCustomerDebt[]
  customerDebt:string
  capturedAt:string
  businessDate:string
