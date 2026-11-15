@@ -41,10 +41,32 @@ function formatDate(date: string) {
 const formatGrams = (value: string | null) =>
   value === null ? '—' : Number(value).toLocaleString('en-US', {minimumFractionDigits:2,maximumFractionDigits:2}) + ' g'
 
-/** Empty until the real gold-refining session API is implemented.
- * Do not derive "saved sessions" from a UI preview or from production transactions.
+/** Presentation-only records for reviewing the list UI.
+ * Never persist, export as real sessions, or mix with API data.
  */
-const PREVIEW_SESSIONS: GoldSessionListItem[] = []
+function createPreviewSessions(month: string): GoldSessionListItem[] {
+  const today = new Date()
+  const [year, monthNumber] = month.split('-').map(Number)
+  const endDay = month === isoLocalDate(today).slice(0, 7)
+    ? today.getDate()
+    : new Date(year, monthNumber, 0).getDate()
+  const days = Array.from({length: Math.min(12, endDay)}, (_, i) => endDay - i)
+  const statuses: GoldSessionStatus[] = ['DRAFT', 'LOCKED', 'FINALIZED', 'LOCKED', 'FINALIZED', 'REOPENED', 'LOCKED', 'FINALIZED', 'LOCKED', 'FINALIZED', 'LOCKED', 'FINALIZED']
+  const totals = ['9104.20', '9099.85', '9102.30', '9098.75', '9106.10', '9101.40', '9095.90', '9097.65', '9100.25', '9103.80', '9094.30', '9098.20']
+  const differences = [null, '-0.35', '2.45', '-3.55', '7.35', '-4.70', '-5.50', '1.75', '2.60', '3.55', '-9.50', '3.90']
+  return days.map((day, i) => {
+    const sessionDate = month + '-' + String(day).padStart(2, '0')
+    return {
+      id: 'demo-' + sessionDate,
+      sessionDate,
+      finalizedAt: statuses[i] === 'DRAFT' ? null : sessionDate + 'T' + String(17 + (i % 4)).padStart(2, '0') + ':30:00',
+      operatorName: ['Nguyễn Văn An', 'Trần Thị Lan', 'Phạm Minh Anh'][i % 3],
+      totalGoldG: statuses[i] === 'DRAFT' ? null : totals[i],
+      differenceG: statuses[i] === 'DRAFT' ? null : differences[i],
+      status: statuses[i],
+    }
+  })
+}
 
 export function GoldSessionsPage() {
   const navigate = useNavigate()
@@ -52,7 +74,7 @@ export function GoldSessionsPage() {
   const [status, setStatus] = useState<GoldSessionStatus | 'ALL'>('ALL')
   const [page, setPage] = useState(1)
   const currentMonth = isoLocalDate(new Date()).slice(0,7)
-  const filtered = useMemo(() => PREVIEW_SESSIONS.filter(row =>
+  const filtered = useMemo(() => createPreviewSessions(month).filter(row =>
     row.sessionDate.startsWith(month) && (status === 'ALL' || row.status === status)
   ), [month, status])
   const setSelectedMonth = (next: string) => {
@@ -64,7 +86,7 @@ export function GoldSessionsPage() {
     <div className="gold-sessions-title">
       <div>
         <Typography.Title level={3}>Phiên tịnh vàng</Typography.Title>
-        <Typography.Text type="secondary">Danh sách và lịch sử các phiên tịnh vàng hằng ngày</Typography.Text>
+        <Typography.Text type="secondary">Danh sách và lịch sử các phiên tịnh vàng hằng ngày · Dữ liệu minh họa</Typography.Text>
       </div>
       <Button type="primary" onClick={() => navigate('/gold/daily/' + isoLocalDate(new Date()))}>Mở trang tịnh vàng</Button>
     </div>
@@ -87,7 +109,7 @@ export function GoldSessionsPage() {
     </div>
     <div className="gold-sessions-table">
       <div className="gold-sessions-table-heading">
-        <strong>Danh sách phiên</strong>
+        <strong>Danh sách phiên <Tag color="orange">DỮ LIỆU MẪU</Tag></strong>
         <span>Tháng {month.slice(5,7)}/{month.slice(0,4)}</span>
       </div>
       <Table<GoldSessionListItem>
@@ -101,16 +123,16 @@ export function GoldSessionsPage() {
           <Button onClick={()=>navigate('/gold/daily/2026-09-29')}>Xem biểu mẫu mẫu ngày 29/09/2026</Button>
         </Empty>}}
         columns={[
-          {title:'Ngày tịnh',dataIndex:'sessionDate',width:145,render:(date:string)=>formatDate(date)},
-          {title:'Thời gian chốt',dataIndex:'finalizedAt',width:160,render:(value:string|null)=>value?new Date(value).toLocaleString('vi-VN'):'—'},
+          {title:'Ngày tịnh',dataIndex:'sessionDate',width:145,render:(date:string)=><span>{formatDate(date)} <Tag style={{marginLeft:4}}>Mẫu</Tag></span>},
+          {title:'Thời gian chốt',dataIndex:'finalizedAt',width:160,render:(value:string|null)=>value?formatDate(value.slice(0,10))+' '+value.slice(11,16):'—'},
           {title:'Người thực hiện',dataIndex:'operatorName',width:170,render:(value:string|null)=>value??'—'},
           {title:'Tổng vàng tịnh được',dataIndex:'totalGoldG',width:180,align:'right',render:formatGrams},
-          {title:'Chênh lệch',dataIndex:'differenceG',width:140,align:'right',render:formatGrams},
+          {title:'Chênh lệch',dataIndex:'differenceG',width:140,align:'right',render:(v:string|null)=><span style={{color:v && Number(v)<0?'#cf1322':undefined}}>{v && Number(v)>0?'+':''}{formatGrams(v)}</span>},
           {title:'Trạng thái',dataIndex:'status',width:150,render:(value:GoldSessionStatus)=><Tag color={STATUS_COLOR[value]}>{STATUS_LABEL[value]}</Tag>},
-          {title:'',key:'action',width:120,render:(_,row)=><Button type="link" icon={<EyeOutlined/>} onClick={()=>navigate('/gold/daily/'+row.sessionDate)}>Chi tiết</Button>},
+          {title:'',key:'action',width:120,render:(_,row)=><Button type="link" icon={<EyeOutlined/>} onClick={()=>navigate('/gold/daily/'+row.sessionDate)}>Xem mẫu</Button>},
         ]}
       />
     </div>
-    <div className="gold-sessions-preview-note">Đây là bản xem trước của trang danh sách. API lưu phiên, chốt phiên và khóa phiên chưa được triển khai; bảng sẽ chỉ hiển thị dữ liệu thực sau khi backend được kết nối.</div>
+    <div className="gold-sessions-preview-note">Toàn bộ dòng trong bảng là dữ liệu giả lập để duyệt UI, không phải phiên đã lưu. Bấm “Xem mẫu” chỉ mở trang nhập liệu xem trước; chưa có API đọc, lưu, chốt hoặc khóa phiên.</div>
   </div>
 }
