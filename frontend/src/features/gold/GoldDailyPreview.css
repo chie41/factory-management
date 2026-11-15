@@ -15,3 +15,21 @@
 .gold-worker-table tbody td{font-variant-numeric:tabular-nums}
 .gold-summary{width:100%;box-sizing:border-box}
 @media(min-width:1251px){.gold-worker-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+/* Scroll the complete document; keep daily totals visible as the operator reaches lower tables. */
+@media (min-width: 851px) {
+  .gold-entry-scroll {
+    max-height: none;
+    height: auto;
+    overflow: visible;
+    scrollbar-gutter: auto;
+    padding-right: 0;
+  }
+  .gold-summary {
+    position: sticky;
+    top: 16px;
+    align-self: start;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+  }
+}
