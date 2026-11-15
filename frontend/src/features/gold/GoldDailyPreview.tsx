@@ -131,7 +131,7 @@ export function GoldDailyPreview() {
       </Section></div>
     </div><aside className="gold-summary">
       <h3>TỔNG KẾT NGÀY</h3>
-      <div className="gold-summary-line"><span>Vàng còn ở thợ cuối ngày</span><strong>{format(issued, ' g')}</strong></div>
+      <div className="gold-summary-line"><span>Vàng còn ở thợ cuối ngày</span><strong>{format(workerOutstanding, ' g')}</strong></div>
       <div className="gold-summary-line"><span>Vàng cân hiện tại</span><strong>{format(weighed, ' g')}</strong></div>
       <div className="gold-summary-line"><span>Khách nợ vàng</span><strong>{format(numberValue(data.customerDebt), ' g')}</strong></div>
       <div className="gold-summary-line"><span>Túi bóng</span><strong>{format(bagTotal, ' g')}</strong></div>
