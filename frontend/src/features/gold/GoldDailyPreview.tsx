@@ -76,13 +76,14 @@ function WorkerCard({ worker }: { worker: Worker }) {
   const refined = total(worker.jobs.map(job => numberValue(job.refined)))
   const complete = worker.jobs.length > 0 && worker.jobs.every(job => job.refined !== undefined)
   const difference = complete ? refined - received : null
+  const outstanding = received - refined
   return <section className="gold-worker-card">
     <div className="gold-worker-title"><strong>{worker.name}</strong><span>{worker.jobs.length ? worker.jobs.length + ' công việc' : 'Không phát sinh'}</span></div>
     <table className="gold-worker-table"><thead><tr><th>CÔNG VIỆC</th><th>NHẬN</th><th>TỊNH</th></tr></thead>
       <tbody>{worker.jobs.length ? worker.jobs.map((job, index) => <tr key={index}><td title={job.title}>{job.title}</td><td>{format(numberValue(job.received))}</td><td>{format(numberValue(job.refined))}</td></tr>) : <tr><td colSpan={3} className="gold-empty-row">Chưa có công việc</td></tr>}</tbody>
       <tfoot><tr><th>TỔNG</th><td>{format(received)}</td><td>{complete || worker.jobs.length === 0 ? format(refined) : format(null)}</td></tr></tfoot>
     </table>
-    <div className="gold-worker-footer"><span>Hao / Heo</span><strong className={difference != null && difference < 0 ? 'gold-negative' : ''}>{worker.jobs.length === 0 ? '0,00 g' : format(difference, ' g')}</strong></div>
+    <div className="gold-worker-footer"><span>Hao / Heo</span><strong className={difference != null && difference < 0 ? 'gold-negative' : ''}>{worker.jobs.length === 0 ? '0,00 g' : format(difference, ' g')}</strong></div><div className="gold-worker-footer gold-outstanding"><span>Còn giữ cuối ngày</span><strong className={outstanding < 0 ? 'gold-negative' : ''}>{format(outstanding, ' g')}</strong></div>
   </section>
 }
 export function GoldDailyPreview() {
@@ -97,21 +98,23 @@ export function GoldDailyPreview() {
   const updateWeight = (index: number, field: keyof WeighRow, value: string) => setData(prev => ({ ...prev, weights: prev.weights.map((item, i) => i === index ? { ...item, [field]: value } : item) }))
   const updateQuantity = (section: 'bags' | 'labels', index: number, field: keyof QuantityRow, value: string) => setData(prev => ({ ...prev, [section]: prev[section].map((item, i) => i === index ? { ...item, [field]: value } : item) }))
   const updateOther = (index: number, field: keyof OtherRow, value: string) => setData(prev => ({ ...prev, others: prev.others.map((item, i) => i === index ? { ...item, [field]: value } : item) }))
-  const issued = useMemo(() => total(data.workers.flatMap(worker => worker.jobs.map(job => numberValue(job.received)))), [data.workers])
+  // Each issued amount remains with the worker until physically returned, including across days.
+  // Missing return data is not a confirmed zero return; it remains outstanding in the preview.
+  const workerOutstanding = useMemo(() => total(data.workers.flatMap(worker => worker.jobs.map(job => (numberValue(job.received) ?? 0) - (numberValue(job.refined) ?? 0)))), [data.workers])
   const weighed = useMemo(() => total(data.weights.map(row => row.gross ? Math.max(0, (numberValue(row.gross) ?? 0) - (numberValue(row.box) ?? 0)) : null)), [data.weights])
   const bagTotal = useMemo(() => total(data.bags.map(row => row.count ? (numberValue(row.unit) ?? 0) * (numberValue(row.count) ?? 0) : null)), [data.bags])
   const labelTotal = useMemo(() => total(data.labels.map(row => row.count ? (numberValue(row.unit) ?? 0) * (numberValue(row.count) ?? 0) : null)), [data.labels])
   const othersPlus = useMemo(() => total(data.others.map(row => numberValue(row.add))), [data.others])
   const othersMinus = useMemo(() => total(data.others.map(row => numberValue(row.subtract))), [data.others])
   // Confirmed business formula. UI-only calculation until real gold sources are integrated.
-  const finalGold = issued + weighed + (numberValue(data.customerDebt) ?? 0) - bagTotal - labelTotal + othersPlus - othersMinus
+  const finalGold = workerOutstanding + weighed + (numberValue(data.customerDebt) ?? 0) - bagTotal - labelTotal + othersPlus - othersMinus
   return <div className="gold-page">
     <div className="gold-page-heading"><div><Typography.Title level={3}>Tịnh vàng hằng ngày</Typography.Title><Typography.Text type="secondary">Sheet vận hành · Trọng lượng (g)</Typography.Text></div>
       <div className="gold-date-controls"><Button aria-label="Ngày trước" icon={<LeftOutlined />} onClick={() => moveDate(-1)} /><input className="gold-date-input" type="date" value={day} onChange={e => setDate(e.target.value)} aria-label="Ngày tịnh vàng" /><Button aria-label="Ngày sau" icon={<RightOutlined />} onClick={() => moveDate(1)} /><Tag color="blue">Bản xem trước</Tag></div></div>
     <div className="gold-preview-notice"><InfoCircleOutlined /> Giao diện mẫu từ Figma. Mọi dữ liệu đang hiển thị chỉ để xem trước; thay đổi không được lưu và không tác động đến công nợ, tồn vàng hoặc sản xuất.</div>
     <div className="gold-layout"><div className="gold-entry-scroll">
       <Section title="KHÁCH NỢ VÀNG" actions={<Button type="link" onClick={() => setModal('debt')}>Xem chi tiết ›</Button>}><div className="gold-debt-value">{format(numberValue(data.customerDebt), ' g')}</div></Section>
-      <Section title="THỢ" actions={<div className="gold-issued"><small>TỔNG GIAO THỢ</small><strong>{format(issued, ' g')}</strong></div>}><div className="gold-worker-grid">{data.workers.map(worker => <WorkerCard key={worker.id} worker={worker} />)}</div></Section>
+      <Section title="THỢ" actions={<div className="gold-issued"><small>VÀNG CÒN Ở THỢ</small><strong>{format(workerOutstanding, ' g')}</strong></div>}><div className="gold-worker-grid">{data.workers.map(worker => <WorkerCard key={worker.id} worker={worker} />)}</div></Section>
       <div className="gold-dual-grid"><Section title="VÀNG CÂN HIỆN TẠI">
         <table className="gold-entry-table"><thead><tr><th>HỘP</th><th>CÂN (g)</th><th>TỊNH (g)</th></tr></thead><tbody>{data.weights.map((row, i) => <tr key={i}><td><Button size="small" block onClick={() => { setSelectedWeight(i); setModal('box') }}>{row.box ? format(numberValue(row.box)) : 'Chọn hộp'}</Button></td><td><DecimalField value={row.gross} onChange={v => updateWeight(i, 'gross', v)} /></td><td className="gold-right">{row.gross ? format(Math.max(0, (numberValue(row.gross) ?? 0) - (numberValue(row.box) ?? 0))) : '—'}</td></tr>)}</tbody><tfoot><tr><th colSpan={2}>TỔNG</th><td className="gold-right">{format(weighed)}</td></tr></tfoot></table>
         {data.weights.length >= 6 && data.weights.every(r => r.gross !== '') && <Button type="link" icon={<PlusOutlined />} onClick={() => setData(p => ({ ...p, weights: [...p.weights, { box: '', gross: '' }] }))}>Thêm dòng</Button>}
@@ -128,7 +131,7 @@ export function GoldDailyPreview() {
       </Section></div>
     </div><aside className="gold-summary">
       <h3>TỔNG KẾT NGÀY</h3>
-      <div className="gold-summary-line"><span>Tổng giao thợ</span><strong>{format(issued, ' g')}</strong></div>
+      <div className="gold-summary-line"><span>Vàng còn ở thợ cuối ngày</span><strong>{format(issued, ' g')}</strong></div>
       <div className="gold-summary-line"><span>Vàng cân hiện tại</span><strong>{format(weighed, ' g')}</strong></div>
       <div className="gold-summary-line"><span>Khách nợ vàng</span><strong>{format(numberValue(data.customerDebt), ' g')}</strong></div>
       <div className="gold-summary-line"><span>Túi bóng</span><strong>{format(bagTotal, ' g')}</strong></div>
@@ -136,7 +139,7 @@ export function GoldDailyPreview() {
       <div className="gold-summary-line"><span>Yếu tố khác (+)</span><strong>{format(othersPlus, ' g')}</strong></div>
       <div className="gold-summary-line"><span>Yếu tố khác (−)</span><strong>{format(othersMinus, ' g')}</strong></div>
       <div className="gold-summary-divider" /><div className="gold-summary-line"><span>Lần trước đã chốt</span><strong>{format(numberValue(data.previousClosed), ' g')}</strong></div>
-      <div className="gold-summary-result"><small>TỔNG VÀNG TỊNH ĐƯỢC</small><strong>{format(finalGold, ' g')}</strong><p>Tổng giao thợ + Cân hiện tại + Khách nợ vàng − Túi bóng − Nhãn đá + Khác cộng − Khác trừ. Chỉ là phép tính trên dữ liệu xem trước.</p></div>
+      <div className="gold-summary-result"><small>TỔNG VÀNG TỊNH ĐƯỢC</small><strong>{format(finalGold, ' g')}</strong><p>Vàng còn ở thợ cuối ngày + Cân hiện tại + Khách nợ vàng − Túi bóng − Nhãn đá + Khác cộng − Khác trừ. Chỉ là phép tính trên dữ liệu xem trước.</p></div>
       <Button type="primary" block disabled title="Chưa triển khai ghi dữ liệu và chốt phiên">Chốt phiên tịnh vàng</Button>
     </aside></div>
     <Modal open={modal === 'debt'} title="Khách nợ vàng" onCancel={() => setModal(null)} onOk={() => setModal(null)} okText="Đóng" cancelButtonProps={{ style: { display: 'none' } }}><p>Tổng nợ vàng minh họa: <strong>{format(numberValue(data.customerDebt), ' g')}</strong></p><Input.TextArea value={customerNotes} onChange={e => setCustomerNotes(e.target.value)} rows={3} aria-label="Ghi chú xem trước" /><Typography.Text type="secondary">Chưa có drill-through dữ liệu khách hàng thật.</Typography.Text></Modal>
