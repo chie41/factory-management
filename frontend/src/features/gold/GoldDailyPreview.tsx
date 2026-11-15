@@ -50,9 +50,9 @@ function demoDay(date:string, template: GoldLayoutTemplate): GoldDay {
 function applyLayout(day: GoldDay, next: GoldLayoutTemplate): GoldDay {
   const oldPresetCount=day.layout.bagWeights.length
   const leftover = day.bags.slice(next.bagWeights.length, oldPresetCount)
-    .filter(row => row.count !== '')
+    .filter(row => row.count !== '').map(row => ({ ...row, name: row.name || 'Túi ' + row.unit + 'g' }))
   const bags = [
-    ...next.bagWeights.map((unit,i)=>({ name:'', unit, count:day.bags[i]?.count ?? '' })),
+    ...next.bagWeights.map((unit,i)=>({ name:'', unit, count:i < oldPresetCount ? (day.bags[i]?.count ?? '') : '' })),
     ...leftover,
     ...day.bags.slice(oldPresetCount),
   ]
