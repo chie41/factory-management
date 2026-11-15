@@ -100,7 +100,7 @@ export function calculateGoldTotals(source:Source,workIds:string[],manual:GoldMa
  for(const [rows,kind] of [[manual.bags,'bags'],[manual.labels,'labels']] as const){
   for(const row of rows){
    if(row.unit===''||row.count==='') {
-    if(strict && (row.unit!==''||row.count!=='')) throw new BadRequestException('Dòng '+kind+' thiếu trọng lượng hoặc số lượng');
+    if(strict && row.count!=='' && row.unit==='') throw new BadRequestException('Dòng '+kind+' có số lượng nhưng thiếu trọng lượng');
     continue;
    }
    const result=qty(row.unit)*BigInt(row.count);
