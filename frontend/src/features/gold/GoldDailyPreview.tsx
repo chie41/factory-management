@@ -44,7 +44,7 @@ const emptyScales = () => Array.from({length:6},():GoldScaleRow=>({box:'',gross:
 const emptyOthers = () => Array.from({length:6},():GoldOtherRow=>({name:'',add:'',subtract:''}))
 const initialVersions: GoldTemplateVersion[] = [{effectiveFrom:'0001-01-01',template:cloneGoldTemplate(INITIAL_GOLD_TEMPLATE)}]
 function demoDay(date:string, template: GoldLayoutTemplate): GoldDay {
-  const show = date==='2026-09-29'
+  const show = date==='2026-09-29' || date===dateString(new Date())
   return {
     availableWorks: Object.fromEntries(WORKER_SLOTS.map(([id])=>[id,show?(SAMPLE_WORK[id]??[]).map(job=>({...job})):[]])),
     workers: WORKER_SLOTS.map(([id,name])=>({id,name,jobs:show?(SAMPLE_WORK[id]??[]).filter(job=>(SAMPLE_SELECTED_IDS[id]??[]).includes(job.id)).map(job=>({...job})):[]})),
