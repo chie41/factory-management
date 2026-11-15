@@ -92,7 +92,7 @@ export function GoldDailyPreview() {
   const [selectedWeight, setSelectedWeight] = useState(0)
   const [material, setMaterial] = useState<QuantityRow>({ name: '', unit: '', count: '' })
   const [customerNotes, setCustomerNotes] = useState('Dữ liệu mẫu, chưa liên kết Sổ giao dịch khách hàng.')
-  const setDate = (next: string) => { if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(next)) return; setDay(next); setData(newDemoDay(next)) }
+  const setDate = (next: string) => { if (!/^\d{4}-\d{2}-\d{2}$/.test(next)) return; setDay(next); setData(newDemoDay(next)) }
   const moveDate = (days: number) => { const date = new Date(day + 'T12:00:00'); date.setDate(date.getDate() + days); const next = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0'); setDate(next) }
   const updateWeight = (index: number, field: keyof WeighRow, value: string) => setData(prev => ({ ...prev, weights: prev.weights.map((item, i) => i === index ? { ...item, [field]: value } : item) }))
   const updateQuantity = (section: 'bags' | 'labels', index: number, field: keyof QuantityRow, value: string) => setData(prev => ({ ...prev, [section]: prev[section].map((item, i) => i === index ? { ...item, [field]: value } : item) }))
