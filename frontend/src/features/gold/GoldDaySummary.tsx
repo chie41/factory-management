@@ -15,7 +15,7 @@ export function GoldDaySummary({ workerBalance, scale, debt, bags, labels, plus,
   const difference = previous == null ? null : total - previous
   const highlight = difference != null && (difference < 0 || difference > 30)
   const lines = [
-    ['Vàng còn ở thợ', workerBalance],
+    ['Tổng giao thợ', workerBalance],
     ['Vàng cân hiện tại', scale],
     ['Khách nợ vàng', debt],
     ['Túi bóng', -bags],
