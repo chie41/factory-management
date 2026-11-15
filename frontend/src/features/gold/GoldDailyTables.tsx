@@ -1,5 +1,6 @@
 import { Button, Input, InputNumber, Select } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
+import type { GoldBox } from './goldLayoutTemplate'
 
 export type GoldScaleRow = { box: string; gross: string }
 export type GoldAmountRow = { name: string; unit: string; count: string }
@@ -51,21 +52,26 @@ function EntryBlock({ title, cols, headers, children, onAdd, footerLabel, totals
 const scaleColumns = 'minmax(0,1.7fr) minmax(0,1fr) minmax(0,1.05fr)'
 const amountColumns = 'minmax(0,1.7fr) minmax(0,.75fr) minmax(0,1.3fr)'
 const otherColumns = 'minmax(0,1.8fr) minmax(0,.92fr) minmax(0,.92fr)'
-const BOXES = [
-  { value: '455.00', label: 'Hộp 01 · 455.00g' },
-  { value: '0.00', label: 'Không hộp · 0g' },
-]
-export function GoldScaleTable({ rows, onChange, onAdd }: {
+export const NO_BOX_ID = 'none'
+export function GoldScaleTable({ rows, boxes, onChange, onAdd }: {
   rows: GoldScaleRow[]
+  boxes: GoldBox[]
   onChange: (index: number, key: keyof GoldScaleRow, value: string) => void
   onAdd: () => void
 }) {
-  const total = sumGold(rows.map(row => row.gross === '' ? null : (numberOrNull(row.gross) ?? 0) - (numberOrNull(row.box) ?? 0)))
+  const options = [{ value: NO_BOX_ID, label: 'Không hộp · 0g' }, ...boxes.map(box => ({ value: box.id, label: box.name + ' · ' + box.tareG + 'g' }))]
+  const tare = (boxId: string) => boxId === NO_BOX_ID ? 0 : numberOrNull(boxes.find(box => box.id === boxId)?.tareG) ?? null
+  const netValue = (row: GoldScaleRow) => {
+    const gross = numberOrNull(row.gross)
+    const boxTare = tare(row.box)
+    return gross == null || boxTare == null ? null : gross - boxTare
+  }
+  const total = sumGold(rows.map(netValue))
   return <EntryBlock title="Vàng cân hiện tại" cols={scaleColumns} headers={['HỘP', 'SỐ CÂN', 'VÀNG THỰC']} onAdd={onAdd} footerLabel="TỔNG CÂN" totals={['',formatGold(total)]}>
     {rows.map((row, i) => {
-      const net = numberOrNull(row.gross) == null ? null : (numberOrNull(row.gross) ?? 0) - (numberOrNull(row.box) ?? 0)
+      const net = netValue(row)
       return <div className="gold-grid-row" style={{ gridTemplateColumns: scaleColumns }} key={i}>
-        <Select aria-label="Hộp" size="small" className="gold-box-select" placeholder="Chọn hộp..." options={BOXES}
+        <Select aria-label="Hộp" size="small" className="gold-box-select" placeholder="Chọn hộp..." options={options}
           value={row.box || undefined} onChange={v => onChange(i,'box',v)} />
         <GoldInput value={row.gross} onChange={v => onChange(i,'gross',v)} />
         <strong className="gold-align-right">{formatGold(net)}</strong>
@@ -73,8 +79,9 @@ export function GoldScaleTable({ rows, onChange, onAdd }: {
     })}
   </EntryBlock>
 }
-export function GoldBagsTable({ rows, onChange, onAdd, onCustom }: {
+export function GoldBagsTable({ rows, presetCount, onChange, onAdd, onCustom }: {
   rows: GoldAmountRow[]
+  presetCount: number
   onChange: (index: number, key: keyof GoldAmountRow, value: string) => void
   onAdd: () => void
   onCustom: (index: number) => void
@@ -82,7 +89,7 @@ export function GoldBagsTable({ rows, onChange, onAdd, onCustom }: {
   const total = sumGold(rows.map(row => row.count === '' || row.unit === '' ? null : (numberOrNull(row.unit) ?? 0) * (numberOrNull(row.count) ?? 0)))
   return <EntryBlock title="Túi bóng / bao bóng" cols={amountColumns} headers={['TRỌNG LƯỢNG','SL','TỔNG']} onAdd={onAdd} footerLabel="TỔNG TÚI BÓNG" totals={['',formatGold(total)]}>
     {rows.map((row,i) => <div className="gold-grid-row" style={{ gridTemplateColumns: amountColumns }} key={i}>
-      {i < 5 ? <span className="gold-weight-preset">{formatGold(numberOrNull(row.unit))}</span>
+      {i < presetCount ? <span className="gold-weight-preset">{formatGold(numberOrNull(row.unit))}</span>
         : <Button className="gold-custom-choice" size="small" block onClick={() => onCustom(i)}>{row.unit ? row.name + ' · ' + row.unit + 'g' : 'Loại khác'}</Button>}
       <GoldInput value={row.count} onChange={v => onChange(i,'count',v)} integer />
       <strong className="gold-align-right">{row.count && row.unit ? formatGold((numberOrNull(row.unit) ?? 0) * (numberOrNull(row.count) ?? 0)) : '—'}</strong>
