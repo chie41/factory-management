@@ -164,15 +164,15 @@ export class GoldRefiningService {
   const works=await c.query<{id:string;employee_id:string;name:string;title:string;work_date:string;issued:string;returned:string|null}>(`
    WITH movements AS (
     SELECT m.employee_id,m.batch_id,m.step_id,
-       (m.occurred_at AT TIME ZONE 'Asia/Ho_Chi_Minh')::date work_date,
+       MIN((m.occurred_at AT TIME ZONE 'Asia/Ho_Chi_Minh')::date) work_date,
        SUM(m.quantity*m.effect) FILTER (WHERE m.kind IN ('INITIAL','ADDITIONAL','TRANSFER_IN')) issued,
        SUM(m.quantity*m.effect) FILTER (WHERE m.kind IN ('RETURN_UNUSED','RETURN_TOTAL','RECEIVE_PRODUCT','TRANSFER_OUT')) returned
     FROM batch_material_movements m
     WHERE m.material_type='GOLD' AND m.employee_id IS NOT NULL
       AND (m.occurred_at AT TIME ZONE 'Asia/Ho_Chi_Minh')::date <= $1::date
-    GROUP BY m.employee_id,m.batch_id,m.step_id,(m.occurred_at AT TIME ZONE 'Asia/Ho_Chi_Minh')::date
+    GROUP BY m.employee_id,m.batch_id,m.step_id
    )
-   SELECT (m.batch_id::text||':'||m.step_id::text||':'||m.employee_id::text||':'||m.work_date::text) id,
+   SELECT (m.batch_id::text||':'||m.step_id::text||':'||m.employee_id::text) id,
      m.employee_id,e.full_name name,(b.code||' · '||s.name) title,
      m.work_date::text work_date,
      COALESCE(m.issued,0)::text issued,
@@ -318,7 +318,6 @@ export class GoldRefiningService {
    const hours=lockAfterHours??row.lock_after_hours;
    const calculated=totals(row.source_snapshot,row.selected_work_ids,row.manual_entries,row.layout_snapshot,
     await this.previous(c,row.business_date),true);
-   if(calculated.previous_gold_g===null)throw new ConflictException('Chưa có lần tịnh trước đã chốt. Cần xác nhận số dư mở đầu trước khi chốt phiên đầu tiên');
    const updated=await c.query<Session>(`UPDATE gold_refining_sessions
      SET status=CASE WHEN $3::int=0 THEN 'LOCKED' ELSE 'FINALIZED' END,
        finalized_by=$4,finalized_at=clock_timestamp(),locked_at=clock_timestamp()+make_interval(hours=>$3::int),
