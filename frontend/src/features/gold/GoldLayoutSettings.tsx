@@ -10,10 +10,11 @@ type Props = {
   open: boolean
   date: string
   initial: GoldLayoutTemplate
+  allowFuture: boolean
   onCancel: () => void
   onSave: (template: GoldLayoutTemplate, scope: LayoutSaveScope) => void
 }
-export function GoldLayoutSettings({ open, date, initial, onCancel, onSave }: Props) {
+export function GoldLayoutSettings({ open, date, initial, allowFuture, onCancel, onSave }: Props) {
   const [draft, setDraft] = useState<GoldLayoutTemplate>(() => cloneGoldTemplate(initial))
   const [scope, setScope] = useState<LayoutSaveScope>('day')
   useEffect(() => {
@@ -36,8 +37,8 @@ export function GoldLayoutSettings({ open, date, initial, onCancel, onSave }: Pr
     width={700}
     onCancel={onCancel}
     okText={scope === 'day' ? 'Áp dụng riêng ngày này' : 'Áp dụng từ ngày này'}
-    okButtonProps={{ disabled: !validBoxes || !validWeights }}
-    onOk={() => onSave(cloneGoldTemplate(draft), scope)}
+    okButtonProps={{ disabled: !validBoxes || !validWeights || (scope === 'future' && !allowFuture) }}
+    onOk={() => { if (scope === 'future' && !allowFuture) return; onSave(cloneGoldTemplate(draft), scope) }}
   >
     <Typography.Paragraph type="secondary">
       Cấu hình danh sách hộp, trọng lượng túi bóng và các dòng nhãn đá xuất hiện trong biểu mẫu.
@@ -80,7 +81,7 @@ export function GoldLayoutSettings({ open, date, initial, onCancel, onSave }: Pr
       <Radio.Group value={scope} onChange={e => setScope(e.target.value as LayoutSaveScope)}>
         <Space direction="vertical">
           <Radio value="day">Chỉ ngày {date} — ngày khác giữ mẫu cũ</Radio>
-          <Radio value="future">Mặc định từ ngày {date} trở đi — các phiên đã mở không tự thay đổi</Radio>
+          <Radio value="future" disabled={!allowFuture}>Mặc định từ ngày {date} trở đi — chỉ Admin có quyền thiết lập</Radio>
         </Space>
       </Radio.Group>
       <Typography.Text type="secondary">
