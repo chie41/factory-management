@@ -44,7 +44,9 @@
 - [ ] Kiểm thử khi không có kết nối backend hoặc thiếu quyền.
 - [ ] Backup/rollback được thử trên staging trước khi triển khai production.
 
-## Đồng bộ package-lock
+## Trạng thái kiểm tra kỹ thuật
 
-Repo đang có `backend/package-lock.json` chưa đồng bộ với `package.json`.
-Trong CI hiện chạy `npm install --package-lock-only --ignore-scripts` trước `npm ci` để cho phép chạy build/test. **Phải commit lockfile mới rồi bỏ workaround CI trước khi merge**.
+- Đã đồng bộ và commit `backend/package-lock.json`; `npm ci` sạch không cần sửa file khi CI chạy.
+- CI GitHub Actions đạt frontend build, backend build, Vitest nghiệp vụ trên nhánh tính năng:
+  https://github.com/chie41/factory-management/actions/runs/43759751177
+- **Chưa chạy kiểm thử tích hợp database staging**, chưa áp dụng migration vào môi trường đang vận hành.
