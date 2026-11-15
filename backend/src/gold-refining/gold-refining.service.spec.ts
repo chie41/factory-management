@@ -47,7 +47,9 @@ describe('Tịnh vàng · số học chính xác và snapshot công việc',()=>
  it('chặn cân nhỏ hơn trọng lượng vỏ và dòng thiếu trọng lượng khi chốt',()=>{
   expect(()=>calculateGoldTotals(source,['a'],{...manual,scales:[{box:'b1',gross:'100'}]},layout,null,true))
     .toThrow(/vỏ hộp/);
-  expect(()=>calculateGoldTotals(source,['a'],{...manual,bags:[{name:'',unit:'1.20',count:''}]},layout,null,true))
-    .toThrow(/thiếu trọng lượng hoặc số lượng/);
+  expect(()=>calculateGoldTotals(source,['a'],{...manual,bags:[{name:'',unit:'',count:'10'}]},layout,null,true))
+    .toThrow(/thiếu trọng lượng/);
+  expect(calculateGoldTotals(source,['a'],{...manual,bags:[{name:'',unit:'1.20',count:''}]},layout,null,true).bag_gold_g)
+    .toBe('0.0000');
  });
 });
