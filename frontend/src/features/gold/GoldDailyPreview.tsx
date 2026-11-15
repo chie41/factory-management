@@ -97,7 +97,8 @@ export function GoldDailyPreview() {
         <div className="gold-table-pairs">
           <GoldScaleTable rows={data.scales} onChange={updateScale} onAdd={()=>setData(p=>({...p,scales:[...p.scales,{box:'',gross:''}]}))}/>
           <GoldBagsTable rows={data.bags} onChange={(index,key,value)=>updateAmount('bags',index,key,value)}
-            onAdd={()=>setData(p=>({...p,bags:[...p.bags,{name:'',unit:'',count:''}]}))}/>
+            onAdd={()=>setData(p=>({...p,bags:[...p.bags,{name:'',unit:'',count:''}]}))}
+            onCustom={index=>{setCustomRow(index);setCustomName(data.bags[index]?.name??'');setCustomUnit(data.bags[index]?.unit??'')}}/>
           <GoldLabelsTable rows={data.labels} onChange={(index,key,value)=>updateAmount('labels',index,key,value)}
             onAdd={()=>setData(p=>({...p,labels:[...p.labels,{name:'',unit:'',count:''}]}))}/>
           <GoldOtherTable rows={data.others} onChange={updateOther}
