@@ -1,6 +1,7 @@
 import { RbacModule } from './auth/rbac.module.js';
 import { CatalogModule } from './catalog/catalog.module.js';
 import { ProductionModule } from './production/production.module.js';
+import { GoldRefiningModule } from './gold-refining/gold-refining.module.js';
 
 import { Module } from '@nestjs/common';
 import { EmployeesModule } from './employees/employees.module.js';
@@ -24,6 +25,7 @@ import { UsersModule } from './users/users.module.js';
     EmployeesModule,
     CatalogModule,
     ProductionModule,
+    GoldRefiningModule,
   ],
   controllers: [AppController],
   providers: [AppService],
