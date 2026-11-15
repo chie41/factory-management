@@ -322,19 +322,20 @@ export function GoldDailyPreview() {
         </div>
         <section className="gold-workers-section">
           <div className="gold-workers-heading"><h2>THỢ</h2><div><span>TỔNG GIAO THỢ</span><strong>{formatGold(workerBalance,' g')}</strong></div></div>
-          <div className="gold-workers-grid">{data.workers.map(w=><GoldWorkerCard key={w.id} worker={w} onPick={()=>setPickerWorkerId(w.id)} onRemove={workId=>setPendingRemove({workerId:w.id,workId})}/>)}</div>
+          <div className="gold-workers-grid">{data.workers.map(w=><GoldWorkerCard key={w.id} worker={w} disabled={!isEditable} onPick={()=>setPickerWorkerId(w.id)} onRemove={workId=>setPendingRemove({workerId:w.id,workId})}/>)}</div>
+          {data.workers.length===0 && <div className="gold-no-workers">Chưa có công việc thợ trong snapshot của phiên này.</div>
         </section>
         <div className="gold-table-pairs">
-          <GoldScaleTable rows={data.scales} boxes={data.layout.boxes} onChange={updateScale} onAdd={()=>setData(p=>({...p,scales:[...p.scales,{box:'',gross:''}]}))}/>
-          <GoldBagsTable rows={data.bags} onChange={(index,key,value)=>updateAmount('bags',index,key,value)}
+          <GoldScaleTable rows={data.scales} boxes={data.layout.boxes} disabled={!isEditable} onChange={updateScale} onAdd={()=>setData(p=>({...p,scales:[...p.scales,{box:'',gross:''}]}))}/>
+          <GoldBagsTable rows={data.bags} disabled={!isEditable} onChange={(index,key,value)=>updateAmount('bags',index,key,value)}
             onAdd={()=>setData(p=>({...p,bags:[...p.bags,{name:'',unit:'',count:''}]}))}/>
-          <GoldLabelsTable rows={data.labels} onChange={(index,key,value)=>updateAmount('labels',index,key,value)}
+          <GoldLabelsTable rows={data.labels} disabled={!isEditable} onChange={(index,key,value)=>updateAmount('labels',index,key,value)}
             onAdd={()=>setData(p=>({...p,labels:[...p.labels,{name:'',unit:'',count:''}]}))}/>
-          <GoldOtherTable rows={data.others} onChange={updateOther}
+          <GoldOtherTable rows={data.others} disabled={!isEditable} onChange={updateOther}
             onAdd={()=>setData(p=>({...p,others:[...p.others,{name:'',add:'',subtract:''}]}))}/>
         </div>
       </div>
-      <GoldDaySummary workerBalance={workerBalance} scale={scale} debt={numberOrNull(data.debt)??0} bags={bags} labels={labels} plus={plus} minus={minus} previous={numberOrNull(data.previous)}/>
+      <GoldDaySummary workerBalance={workerBalance} scale={scale} debt={numberOrNull(data.debt)??0} bags={bags} labels={labels} plus={plus} minus={minus} previous={numberOrNull(data.previous)} onFinalize={finalizeReal} finalizeDisabled={!session || !isEditable || !canFinalize || isDemo || busy} finalizeBusy={busy}/>
     </div>
     <Modal title="Xác nhận bỏ công việc" open={pendingRemove!==null}
       okText="Bỏ công việc" okButtonProps={{danger:true}}
@@ -343,12 +344,16 @@ export function GoldDailyPreview() {
       <p>Bạn có chắc muốn bỏ <strong>{pendingJob?.title ?? 'công việc này'}</strong> khỏi bảng Tịnh vàng của thợ <strong>{pendingWorker?.name ?? ''}</strong>?</p>
       <p>Thao tác này chỉ loại công việc khỏi phiên Tịnh vàng đang xem, <strong>không xóa công việc hoặc dữ liệu giao nhận trong Sản xuất</strong>. Tổng giao thợ và Tổng kết ngày sẽ được tính lại.</p>
     </Modal>
+    <Modal open={reopenOpen} title="Mở lại phiên Tịnh vàng" okText="Mở lại phiên" okButtonProps={{disabled:reopenReason.trim().length<8,loading:busy}} onOk={()=>void reopenReal()} onCancel={()=>setReopenOpen(false)}>
+      <p>Nhập lý do mở lại phiên (tối thiểu 8 ký tự). Thao tác được ghi nhận trong lịch sử.</p>
+      <Input.TextArea rows={3} value={reopenReason} onChange={e=>setReopenReason(e.target.value)} placeholder="Lý do mở lại..."/>
+    </Modal>
     <GoldWorkPicker worker={pickerWorker} available={pickerWorkerId ? (data.availableWorks[pickerWorkerId] ?? []) : []}
       open={pickerWorkerId!==null} onCancel={()=>setPickerWorkerId(null)} onApply={applyWorks}/>
     <GoldLayoutSettings open={settingsOpen} date={date} initial={data.layout} allowFuture={canManageDefaults} onCancel={()=>setSettingsOpen(false)} onSave={saveLayout}/>
     <Modal title="Khách nợ vàng" open={debtOpen} onCancel={()=>setDebtOpen(false)} onOk={()=>setDebtOpen(false)} okText="Đóng" cancelButtonProps={{style:{display:'none'}}}>
-      <p>Tổng nợ vàng (dữ liệu mẫu): <strong>{formatGold(numberOrNull(data.debt),' g')}</strong></p>
-      <p>Dữ liệu khách hàng chi tiết sẽ lấy từ Sổ giao dịch khách hàng; chưa kết nối API.</p>
+      <p>Tổng nợ vàng theo snapshot: <strong>{formatGold(numberOrNull(data.debt),' g')}</strong></p>
+      <p>Đây là tổng nợ vàng theo ngày đã chọn và được giữ cố định trong snapshot của phiên. Chi tiết theo từng khách hàng sẽ bổ sung sau.</p>
     </Modal>
 
   </div>
