@@ -1,4 +1,4 @@
-import { Button, Input, InputNumber, Select } from 'antd'
+import { Input, InputNumber, Select } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import type { GoldBox } from './goldLayoutTemplate'
 
@@ -79,18 +79,15 @@ export function GoldScaleTable({ rows, boxes, onChange, onAdd }: {
     })}
   </EntryBlock>
 }
-export function GoldBagsTable({ rows, presetCount, onChange, onAdd, onCustom }: {
+export function GoldBagsTable({ rows, onChange, onAdd }: {
   rows: GoldAmountRow[]
-  presetCount: number
   onChange: (index: number, key: keyof GoldAmountRow, value: string) => void
   onAdd: () => void
-  onCustom: (index: number) => void
 }) {
   const total = sumGold(rows.map(row => row.count === '' || row.unit === '' ? null : (numberOrNull(row.unit) ?? 0) * (numberOrNull(row.count) ?? 0)))
   return <EntryBlock title="Túi bóng / bao bóng" cols={amountColumns} headers={['TRỌNG LƯỢNG','SL','TỔNG']} onAdd={onAdd} footerLabel="TỔNG TÚI BÓNG" totals={['',formatGold(total)]}>
     {rows.map((row,i) => <div className="gold-grid-row" style={{ gridTemplateColumns: amountColumns }} key={i}>
-      {i < presetCount ? <span className="gold-weight-preset">{formatGold(numberOrNull(row.unit))}</span>
-        : <Button className="gold-custom-choice" size="small" block onClick={() => onCustom(i)}>{row.unit ? row.name + ' · ' + row.unit + 'g' : 'Loại khác'}</Button>}
+      <GoldInput value={row.unit} onChange={v => onChange(i, 'unit', v)} />
       <GoldInput value={row.count} onChange={v => onChange(i,'count',v)} integer />
       <strong className="gold-align-right">{row.count && row.unit ? formatGold((numberOrNull(row.unit) ?? 0) * (numberOrNull(row.count) ?? 0)) : '—'}</strong>
     </div>)}
