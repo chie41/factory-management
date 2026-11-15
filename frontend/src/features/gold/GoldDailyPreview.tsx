@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
-import { Button, DatePicker, Input, InputNumber, Modal, Select, Tag, Typography } from 'antd'
+import { Button, Input, InputNumber, Modal, Select, Tag, Typography } from 'antd'
 import { LeftOutlined, RightOutlined, PlusOutlined, InfoCircleOutlined } from '@ant-design/icons'
-import dayjs, { type Dayjs } from 'dayjs'
 import { fixedDecimalText } from '../../utils/decimal'
 import './GoldDailyPreview.css'
 
@@ -43,8 +42,8 @@ const SAMPLE_JOBS: Partial<Record<(typeof SLOTS)[number][0], Work[]>> = {
   trang: [{ title: 'SX-0097 · Móc', received: '200.00', refined: '200.10' }],
   lan: [{ title: 'SX-0098 · Hàn', received: '301.88' }],
 }
-function newDemoDay(day: Dayjs): GoldDay {
-  const isExample = day.format('YYYY-MM-DD') === '2026-09-29'
+function newDemoDay(day: string): GoldDay {
+  const isExample = day === '2026-09-29'
   return {
     workers: SLOTS.map(([id, name]) => ({ id, name, jobs: isExample ? (SAMPLE_JOBS[id] ?? []) : [] })),
     weights: isExample ? [{ box: '455.00', gross: '1690.13' }, { box: '0.00', gross: '1177.95' }, { box: '0.00', gross: '1011.21' }, ...EMPTY_WEIGHTS().slice(3)] : EMPTY_WEIGHTS(),
@@ -87,13 +86,14 @@ function WorkerCard({ worker }: { worker: Worker }) {
   </section>
 }
 export function GoldDailyPreview() {
-  const [day, setDay] = useState<Dayjs>(() => dayjs('2026-09-29'))
-  const [data, setData] = useState<GoldDay>(() => newDemoDay(dayjs('2026-09-29')))
+  const [day, setDay] = useState('2026-09-29')
+  const [data, setData] = useState<GoldDay>(() => newDemoDay('2026-09-29'))
   const [modal, setModal] = useState<'debt' | 'box' | 'material' | null>(null)
   const [selectedWeight, setSelectedWeight] = useState(0)
   const [material, setMaterial] = useState<QuantityRow>({ name: '', unit: '', count: '' })
   const [customerNotes, setCustomerNotes] = useState('Dữ liệu mẫu, chưa liên kết Sổ giao dịch khách hàng.')
-  const setDate = (next: Dayjs) => { setDay(next); setData(newDemoDay(next)) }
+  const setDate = (next: string) => { if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(next)) return; setDay(next); setData(newDemoDay(next)) }
+  const moveDate = (days: number) => { const date = new Date(day + 'T12:00:00'); date.setDate(date.getDate() + days); const next = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0'); setDate(next) }
   const updateWeight = (index: number, field: keyof WeighRow, value: string) => setData(prev => ({ ...prev, weights: prev.weights.map((item, i) => i === index ? { ...item, [field]: value } : item) }))
   const updateQuantity = (section: 'bags' | 'labels', index: number, field: keyof QuantityRow, value: string) => setData(prev => ({ ...prev, [section]: prev[section].map((item, i) => i === index ? { ...item, [field]: value } : item) }))
   const updateOther = (index: number, field: keyof OtherRow, value: string) => setData(prev => ({ ...prev, others: prev.others.map((item, i) => i === index ? { ...item, [field]: value } : item) }))
@@ -105,7 +105,7 @@ export function GoldDailyPreview() {
   const othersMinus = useMemo(() => total(data.others.map(row => numberValue(row.subtract))), [data.others])
   return <div className="gold-page">
     <div className="gold-page-heading"><div><Typography.Title level={3}>Tịnh vàng hằng ngày</Typography.Title><Typography.Text type="secondary">Sheet vận hành · Trọng lượng (g)</Typography.Text></div>
-      <div className="gold-date-controls"><Button aria-label="Ngày trước" icon={<LeftOutlined />} onClick={() => setDate(day.subtract(1, 'day'))} /><DatePicker allowClear={false} value={day} format="DD/MM/YYYY" onChange={setDate} /><Button aria-label="Ngày sau" icon={<RightOutlined />} onClick={() => setDate(day.add(1, 'day'))} /><Tag color="blue">Bản xem trước</Tag></div></div>
+      <div className="gold-date-controls"><Button aria-label="Ngày trước" icon={<LeftOutlined />} onClick={() => moveDate(-1)} /><input className="gold-date-input" type="date" value={day} onChange={e => setDate(e.target.value)} aria-label="Ngày tịnh vàng" /><Button aria-label="Ngày sau" icon={<RightOutlined />} onClick={() => moveDate(1)} /><Tag color="blue">Bản xem trước</Tag></div></div>
     <div className="gold-preview-notice"><InfoCircleOutlined /> Giao diện mẫu từ Figma. Mọi dữ liệu đang hiển thị chỉ để xem trước; thay đổi không được lưu và không tác động đến công nợ, tồn vàng hoặc sản xuất.</div>
     <div className="gold-layout"><div className="gold-entry-scroll">
       <Section title="KHÁCH NỢ VÀNG" actions={<Button type="link" onClick={() => setModal('debt')}>Xem chi tiết ›</Button>}><div className="gold-debt-value">{format(numberValue(data.customerDebt), ' g')}</div></Section>
