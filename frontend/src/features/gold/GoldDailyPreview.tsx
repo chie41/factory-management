@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
 import { Button, Modal, Tag, Typography } from 'antd'
+import { usePermissions } from '../auth/hooks/usePermissions'
 import { LeftOutlined, RightOutlined, ReloadOutlined, InfoCircleOutlined, SettingOutlined } from '@ant-design/icons'
-import { GoldScaleTable, GoldBagsTable, GoldLabelsTable, GoldOtherTable, GoldInput, numberOrNull, sumGold, formatGold, NO_BOX_ID, type GoldScaleRow, type GoldAmountRow, type GoldOtherRow } from './GoldDailyTables'
+import { GoldScaleTable, GoldBagsTable, GoldLabelsTable, GoldOtherTable, numberOrNull, sumGold, formatGold, NO_BOX_ID, type GoldScaleRow, type GoldAmountRow, type GoldOtherRow } from './GoldDailyTables'
 import { GoldWorkerCard, type GoldWorker } from './GoldWorkerCard'
 import { GoldDaySummary } from './GoldDaySummary'
 import { GoldLayoutSettings, type LayoutSaveScope } from './GoldLayoutSettings'
@@ -65,15 +66,15 @@ function applyLayout(day: GoldDay, next: GoldLayoutTemplate): GoldDay {
 const dateString = (date:Date) => date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0')
 
 export function GoldDailyPreview() {
+  const { can } = usePermissions()
+  // Preview approximation only; backend must enforce ADMIN role on persisted defaults.
+  const canManageDefaults = can('roles.manage')
   const [date,setDate] = useState('2026-09-29')
   const [versions,setVersions] = useState<GoldTemplateVersion[]>(initialVersions)
   const [data,setData] = useState<GoldDay>(()=>demoDay('2026-09-29',INITIAL_GOLD_TEMPLATE))
   const [openedDays,setOpenedDays] = useState<Record<string,GoldDay>>({})
   const [settingsOpen,setSettingsOpen] = useState(false)
   const [debtOpen,setDebtOpen] = useState(false)
-  const [customRow,setCustomRow] = useState<number|null>(null)
-  const [customName,setCustomName] = useState('')
-  const [customUnit,setCustomUnit] = useState('')
   const changeDate = (next:string) => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(next) || next===date) return
     setOpenedDays(prev=>({...prev,[date]:data}))
@@ -86,6 +87,7 @@ export function GoldDailyPreview() {
     changeDate(dateString(day))
   }
   const saveLayout = (next:GoldLayoutTemplate,scope:LayoutSaveScope) => {
+    if (scope==='future' && !canManageDefaults) return
     if (scope==='future') setVersions(prev=>upsertTemplateVersion(prev,{effectiveFrom:date,template:next}))
     setData(prev=>applyLayout(prev,next))
     setSettingsOpen(false)
@@ -134,9 +136,8 @@ export function GoldDailyPreview() {
         </section>
         <div className="gold-table-pairs">
           <GoldScaleTable rows={data.scales} boxes={data.layout.boxes} onChange={updateScale} onAdd={()=>setData(p=>({...p,scales:[...p.scales,{box:'',gross:''}]}))}/>
-          <GoldBagsTable rows={data.bags} presetCount={data.layout.bagWeights.length} onChange={(index,key,value)=>updateAmount('bags',index,key,value)}
-            onAdd={()=>setData(p=>({...p,bags:[...p.bags,{name:'',unit:'',count:''}]}))}
-            onCustom={index=>{setCustomRow(index);setCustomName(data.bags[index]?.name??'');setCustomUnit(data.bags[index]?.unit??'')}}/>
+          <GoldBagsTable rows={data.bags} onChange={(index,key,value)=>updateAmount('bags',index,key,value)}
+            onAdd={()=>setData(p=>({...p,bags:[...p.bags,{name:'',unit:'',count:''}]}))}/>
           <GoldLabelsTable rows={data.labels} onChange={(index,key,value)=>updateAmount('labels',index,key,value)}
             onAdd={()=>setData(p=>({...p,labels:[...p.labels,{name:'',unit:'',count:''}]}))}/>
           <GoldOtherTable rows={data.others} onChange={updateOther}
@@ -145,17 +146,11 @@ export function GoldDailyPreview() {
       </div>
       <GoldDaySummary workerBalance={workerBalance} scale={scale} debt={numberOrNull(data.debt)??0} bags={bags} labels={labels} plus={plus} minus={minus} previous={numberOrNull(data.previous)}/>
     </div>
-    <GoldLayoutSettings open={settingsOpen} date={date} initial={data.layout} onCancel={()=>setSettingsOpen(false)} onSave={saveLayout}/>
+    <GoldLayoutSettings open={settingsOpen} date={date} initial={data.layout} allowFuture={canManageDefaults} onCancel={()=>setSettingsOpen(false)} onSave={saveLayout}/>
     <Modal title="Khách nợ vàng" open={debtOpen} onCancel={()=>setDebtOpen(false)} onOk={()=>setDebtOpen(false)} okText="Đóng" cancelButtonProps={{style:{display:'none'}}}>
       <p>Tổng nợ vàng (dữ liệu mẫu): <strong>{formatGold(numberOrNull(data.debt),' g')}</strong></p>
       <p>Dữ liệu khách hàng chi tiết sẽ lấy từ Sổ giao dịch khách hàng; chưa kết nối API.</p>
     </Modal>
-    <Modal title="Thêm phụ liệu tùy chỉnh" open={customRow!==null} onCancel={()=>setCustomRow(null)} onOk={()=>{
-      if(customRow==null||!customName.trim()||numberOrNull(customUnit)===null)return
-      setData(p=>({...p,bags:p.bags.map((row,i)=>i===customRow?{...row,name:customName,unit:customUnit}:row)}))
-      setCustomRow(null)
-    }} okText="Lưu" okButtonProps={{disabled:!customName.trim()||numberOrNull(customUnit)===null}}>
-      <div className="gold-custom-fields"><label>Loại / tên<input className="gold-custom-input" value={customName} onChange={e=>setCustomName(e.target.value)}/></label><label>Trọng lượng đơn (g)<GoldInput value={customUnit} onChange={setCustomUnit}/></label></div>
-    </Modal>
+
   </div>
 }
