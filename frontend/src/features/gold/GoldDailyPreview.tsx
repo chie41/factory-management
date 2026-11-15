@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { goldSessionApi, type GoldSession } from './goldSessionApi'
+import { goldSessionApi, type GoldSession, type GoldCustomerDebt } from './goldSessionApi'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { Alert, Button, Input, Modal, Tag, Typography, message } from 'antd'
+import { Alert, Button, Input, Modal, Table, Tag, Typography, message } from 'antd'
 import { usePermissions } from '../auth/hooks/usePermissions'
 import { LeftOutlined, RightOutlined, ReloadOutlined, InfoCircleOutlined, SettingOutlined, ArrowLeftOutlined, SaveOutlined, UnlockOutlined } from '@ant-design/icons'
 import { GoldScaleTable, GoldBagsTable, GoldLabelsTable, GoldOtherTable, numberOrNull, sumGold, formatGold, NO_BOX_ID, type GoldScaleRow, type GoldAmountRow, type GoldOtherRow } from './GoldDailyTables'
@@ -22,6 +22,7 @@ type GoldDay = {
   labels: GoldAmountRow[]
   others: GoldOtherRow[]
   debt: string
+  customerDebts: GoldCustomerDebt[]
   previous: string | null
   layout: GoldLayoutTemplate
 }
@@ -63,6 +64,7 @@ function demoDay(date:string, template: GoldLayoutTemplate): GoldDay {
     labels:template.labelWeights.map((unit,i)=>({name:'',unit:show?(['0.40','0.80'][i]??unit):unit,count:show?(['10','5'][i]??''):''})),
     others:show?[{name:'Nhận bổ sung',add:'12.50',subtract:''},{name:'Điều chỉnh cân',add:'',subtract:'4.00'},...emptyOthers().slice(2)]:emptyOthers(),
     debt:show?(2450 + goldDemoOffset(date)).toFixed(2):'0.00',
+    customerDebts:[],
     previous:show?GOLD_DEMO_PREVIOUS.toFixed(2):null,
     layout:cloneGoldTemplate(template),
   }
@@ -78,6 +80,7 @@ function fromSession(session:GoldSession):GoldDay {
     labels:session.manual_entries.labels,
     others:session.manual_entries.others,
     debt:session.source_snapshot.customerDebt,
+    customerDebts:session.source_snapshot.customerDebts ?? [],
     previous:session.totals_snapshot?.previous_gold_g??null,
     layout:session.layout_snapshot,
   }
@@ -353,7 +356,15 @@ export function GoldDailyPreview() {
     <GoldLayoutSettings open={settingsOpen} date={date} initial={data.layout} allowFuture={canManageDefaults} onCancel={()=>setSettingsOpen(false)} onSave={saveLayout}/>
     <Modal title="Khách nợ vàng" open={debtOpen} onCancel={()=>setDebtOpen(false)} onOk={()=>setDebtOpen(false)} okText="Đóng" cancelButtonProps={{style:{display:'none'}}}>
       <p>Tổng nợ vàng theo snapshot: <strong>{formatGold(numberOrNull(data.debt),' g')}</strong></p>
-      <p>Đây là tổng nợ vàng theo ngày đã chọn và được giữ cố định trong snapshot của phiên. Chi tiết theo từng khách hàng sẽ bổ sung sau.</p>
+      {isDemo ? <p>Đây là số tổng minh họa. Dữ liệu mẫu chưa có danh sách khách hàng.</p>
+      : <Table<GoldCustomerDebt> size="small" rowKey="customerId" dataSource={data.customerDebts} pagination={false}
+        scroll={{y:360}} locale={{emptyText:'Không có khách hàng nợ vàng dương tại ngày tịnh'}}
+        columns={[
+          {title:'Mã KH',dataIndex:'customerCode',width:100},
+          {title:'Khách hàng',dataIndex:'customerName'},
+          {title:'Nợ vàng (g)',dataIndex:'closingGoldG',width:140,align:'right',render:(v:string)=>formatGold(numberOrNull(v))},
+        ]}/>}
+      <p style={{marginTop:12,color:'#667085',fontSize:12}}>Các khoản nợ dương được tính theo sổ khách hàng đến cuối ngày {date}, giữ nguyên trong snapshot cho đến khi Reload dữ liệu.</p>
     </Modal>
 
   </div>
