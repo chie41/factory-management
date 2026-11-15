@@ -24,7 +24,7 @@ export function GoldWorkerCard({ worker, onPick, onRemove }: {
       <colgroup>
         <col style={{width:'43%'}}/><col style={{width:'19%'}}/><col style={{width:'19%'}}/><col style={{width:'19%'}}/>
       </colgroup>
-      <thead><tr><th>CÔNG VIỆC</th><th>NHẬN</th><th>TRẢ</th><th>HAO/HEO</th></tr></thead>
+      <thead><tr><th>CÔNG VIỆC</th><th>GIAO</th><th>NHẬN</th><th>HAO/HEO</th></tr></thead>
       <tbody>{Array.from({length:Math.max(2,worker.jobs.length)},(_,i)=>{
         const job = worker.jobs[i]
         const rowDiff = job && numberOrNull(job.returned) != null ? (numberOrNull(job.returned) ?? 0) - (numberOrNull(job.issued) ?? 0) : null
