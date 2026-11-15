@@ -26,7 +26,8 @@
     "ledger:migrate-excel-import": "node scripts/migrate-ledger-excel-import.mjs --local",
     "ledger:migrate-layout": "node scripts/migrate-ledger-customer-layout.mjs --local",
     "ledger:snapshots": "tsx scripts/backfill-ledger-monthly-balances.ts",
-    "ledger:migrate-snapshots": "node scripts/migrate-ledger-monthly-balances.mjs --local"
+    "ledger:migrate-snapshots": "node scripts/migrate-ledger-monthly-balances.mjs --local",
+    "gold:migrate-sessions": "node scripts/migrate-gold-refining-sessions.mjs --local"
   },
   "dependencies": {
     "@nestjs/common": "^12.0.1",
