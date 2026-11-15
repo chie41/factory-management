@@ -27,7 +27,7 @@ const WORKER_SLOTS = [
   ['nha', 'NHẠ'], ['an', 'AN'], ['binh', 'BÌNH'], ['khoa', 'KHOA'],
   ['hung', 'HÙNG'], ['tuan', 'TUẤN'], ['dung', 'DŨNG'], ['lan', 'LAN'],
 ] as const
-const SAMPLE_WORK: Record<string, GoldWork[]> = {
+const SAMPLE_WORK: Record<string, Omit<GoldWork, 'workDate'>[]> = {
   nha: [{id:'nha-01',title:'SX-0091 · Chuẩn bị',issued:'200.00',returned:'199.80'},{id:'nha-02',title:'SX-0092 · Chuẩn bị',issued:'200.00',returned:'200.00'},{id:'nha-03',title:'SX-0108 · Chuẩn bị',issued:'75.00'}],
   an: [{id:'an-01',title:'SX-0091 · Hàn',issued:'180.00',returned:'180.25'},{id:'an-02',title:'SX-0093 · Hàn',issued:'120.00',returned:'120.00'},{id:'an-03',title:'SX-0110 · Hàn',issued:'65.00'}],
   binh: [{id:'binh-01',title:'SX-0092 · Lắp ráp',issued:'150.00',returned:'149.75'},{id:'binh-02',title:'SX-0094 · Lắp ráp',issued:'100.00',returned:'100.00'},{id:'binh-03',title:'SX-0112 · Lắp ráp',issued:'90.00'}],
@@ -44,11 +44,18 @@ const SAMPLE_SELECTED_IDS: Record<string,string[]> = {
 const emptyScales = () => Array.from({length:6},():GoldScaleRow=>({box:'',gross:''}))
 const emptyOthers = () => Array.from({length:6},():GoldOtherRow=>({name:'',add:'',subtract:''}))
 const initialVersions: GoldTemplateVersion[] = [{effectiveFrom:'0001-01-01',template:cloneGoldTemplate(INITIAL_GOLD_TEMPLATE)}]
+function sampleWorkFor(workerId: string, sessionDate: string): GoldWork[] {
+  return (SAMPLE_WORK[workerId] ?? []).map((job, index) => {
+    const day = new Date(sessionDate + 'T12:00:00')
+    day.setDate(day.getDate() - (index % 3))
+    return { ...job, workDate: dateString(day) }
+  })
+}
 function demoDay(date:string, template: GoldLayoutTemplate): GoldDay {
   const show = isGoldDemoDate(date)
   return {
-    availableWorks: Object.fromEntries(WORKER_SLOTS.map(([id])=>[id,show?(SAMPLE_WORK[id]??[]).map(job=>({...job})):[]])),
-    workers: WORKER_SLOTS.map(([id,name])=>({id,name,jobs:show?(SAMPLE_WORK[id]??[]).filter(job=>(SAMPLE_SELECTED_IDS[id]??[]).includes(job.id)).map(job=>({...job})):[]})),
+    availableWorks: Object.fromEntries(WORKER_SLOTS.map(([id])=>[id,show?sampleWorkFor(id,date):[]])),
+    workers: WORKER_SLOTS.map(([id,name])=>({id,name,jobs:show?sampleWorkFor(id,date).filter(job=>(SAMPLE_SELECTED_IDS[id]??[]).includes(job.id)):[]})),
     scales:show?[{box:'box-01',gross:'1690.13'},{box:NO_BOX_ID,gross:'1177.95'},{box:NO_BOX_ID,gross:'1011.21'},...emptyScales().slice(3)]:emptyScales(),
     bags:[...template.bagWeights.map((unit,i)=>({name:'',unit,count:show?String([10,5,3,2,4][i]??''):''})),{name:'',unit:'',count:''}],
     labels:template.labelWeights.map((unit,i)=>({name:'',unit:show?(['0.40','0.80'][i]??unit):unit,count:show?(['10','5'][i]??''):''})),
