@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Button, Modal, Tag, Typography } from 'antd'
 import { usePermissions } from '../auth/hooks/usePermissions'
-import { LeftOutlined, RightOutlined, ReloadOutlined, InfoCircleOutlined, SettingOutlined } from '@ant-design/icons'
+import { LeftOutlined, RightOutlined, ReloadOutlined, InfoCircleOutlined, SettingOutlined, ArrowLeftOutlined } from '@ant-design/icons'
 import { GoldScaleTable, GoldBagsTable, GoldLabelsTable, GoldOtherTable, numberOrNull, sumGold, formatGold, NO_BOX_ID, type GoldScaleRow, type GoldAmountRow, type GoldOtherRow } from './GoldDailyTables'
 import { GoldWorkerCard, type GoldWorker } from './GoldWorkerCard'
 import { GoldDaySummary } from './GoldDaySummary'
@@ -66,20 +67,33 @@ function applyLayout(day: GoldDay, next: GoldLayoutTemplate): GoldDay {
 const dateString = (date:Date) => date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')+'-'+String(date.getDate()).padStart(2,'0')
 
 export function GoldDailyPreview() {
+  const navigate = useNavigate()
+  const { date: routeDate } = useParams<{ date: string }>()
+  const initialDate = routeDate && /^\d{4}-\d{2}-\d{2}$/.test(routeDate) ? routeDate : dateString(new Date())
   const { can } = usePermissions()
   // Preview approximation only; backend must enforce ADMIN role on persisted defaults.
   const canManageDefaults = can('roles.manage')
-  const [date,setDate] = useState('2026-09-29')
+  const [date,setDate] = useState(initialDate)
   const [versions,setVersions] = useState<GoldTemplateVersion[]>(initialVersions)
-  const [data,setData] = useState<GoldDay>(()=>demoDay('2026-09-29',INITIAL_GOLD_TEMPLATE))
+  const [data,setData] = useState<GoldDay>(()=>demoDay(initialDate,INITIAL_GOLD_TEMPLATE))
   const [openedDays,setOpenedDays] = useState<Record<string,GoldDay>>({})
   const [settingsOpen,setSettingsOpen] = useState(false)
   const [debtOpen,setDebtOpen] = useState(false)
+  useEffect(() => {
+    if (routeDate && /^\d{4}-\d{2}-\d{2}$/.test(routeDate) && routeDate !== date) {
+      setOpenedDays(prev=>({...prev,[date]:data}))
+      setDate(routeDate)
+      setData(openedDays[routeDate] ?? demoDay(routeDate,effectiveGoldTemplate(versions,routeDate)))
+    }
+    // Only respond to browser navigation to another day, not local edit activity.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [routeDate])
   const changeDate = (next:string) => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(next) || next===date) return
     setOpenedDays(prev=>({...prev,[date]:data}))
     setDate(next)
     setData(openedDays[next] ?? demoDay(next,effectiveGoldTemplate(versions,next)))
+    navigate('/gold/daily/' + next)
   }
   const moveDate = (delta:number) => {
     const day=new Date(date+'T12:00:00')
@@ -110,7 +124,7 @@ export function GoldDailyPreview() {
   const minus = sumGold(data.others.map(r=>numberOrNull(r.subtract)))
   return <div className="gold-daily-page">
     <div className="gold-page-heading">
-      <div><Typography.Title level={3}>Tịnh vàng hằng ngày</Typography.Title><Typography.Text type="secondary">Sheet vận hành · Trọng lượng (g)</Typography.Text></div>
+      <div><Button size="small" type="link" icon={<ArrowLeftOutlined/>} onClick={()=>navigate("/gold")}>Danh sách phiên</Button><Typography.Title level={3}>Tịnh vàng hằng ngày</Typography.Title><Typography.Text type="secondary">Sheet vận hành · Trọng lượng (g)</Typography.Text></div>
       <div className="gold-date-controls">
         <Button size="small" aria-label="Ngày trước" onClick={()=>moveDate(-1)} icon={<LeftOutlined/>}/>
         <input className="gold-date-input" type="date" aria-label="Ngày tịnh vàng" value={date} onChange={e=>changeDate(e.target.value)}/>
