@@ -109,3 +109,14 @@
 .gold-work-picker-weight{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .gold-work-picker-hint{display:block;margin-top:12px;font-size:11px}
 @media(max-width:600px){.gold-work-picker-row{grid-template-columns:20px minmax(0,1fr);gap:6px}.gold-work-picker-weight{display:none}}
+
+/* Worker picker: date, work, Giao, Nhận, Hao/Heo. */
+.gold-worker-work-name{gap:1px}
+.gold-worker-sheet .gold-worker-remove{margin-left:-6px;margin-right:1px}
+.gold-work-picker-columns,.gold-work-picker-row{display:grid;grid-template-columns:22px 98px minmax(135px,1fr) 76px 76px 90px;gap:9px;align-items:center;min-width:635px}
+.gold-work-picker-columns{padding:11px 12px;background:#f9f9f9;border-bottom:1px solid #e5e9ef;color:#667085;font-size:10px;font-weight:600;white-space:nowrap}
+.gold-work-picker-columns span:nth-child(n+4){text-align:right}
+.gold-work-picker-date{font-size:11px;color:inherit;white-space:nowrap}
+.gold-work-picker-row{min-height:46px}
+.gold-work-picker-weight{font-size:12px;display:block}
+.gold-work-picker-list{overflow:auto}
