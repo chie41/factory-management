@@ -8,7 +8,8 @@ import type { GoldTemplateDto, GoldManualDto, GoldSaveDto } from './gold-refinin
 type Db = PoolClient;
 type GoldWork = { id:string; title:string; workDate:string; issued:string; returned:string|null };
 type GoldWorker = {id:string; name:string; jobs:GoldWork[]};
-type Source = { workers:GoldWorker[]; customerDebt:string; capturedAt:string; businessDate:string };
+type GoldCustomerDebt = {customerId:string;customerCode:string;customerName:string;closingGoldG:string};
+type Source = { workers:GoldWorker[]; customerDebt:string; customerDebts:GoldCustomerDebt[]; capturedAt:string; businessDate:string };
 type Session = {
  id:string; business_date:string; status:'DRAFT'|'FINALIZED'|'LOCKED'|'REOPENED';
  version:number; source_snapshot:Source; manual_entries:GoldManualDto;
@@ -190,7 +191,7 @@ export class GoldRefiningService {
    worker.jobs.push({id:item.id,title:item.title,workDate:item.work_date,issued:item.issued,returned:item.returned});
    byWorker.set(worker.id,worker);
   }
-  const debt=await c.query<{closing:string;invalid_count:string}>(`
+  const debt=await c.query<{customer_id:string;customer_code:string;customer_name:string;closing_gold_g:string;invalid_count:string}>(`
     WITH movements AS (
       SELECT customer_id,${goldDeltaSql('l')} delta
       FROM customers_ledger l
@@ -199,15 +200,21 @@ export class GoldRefiningService {
       SELECT customer_id,SUM(delta) balance,COUNT(*) FILTER(WHERE delta IS NULL) invalid
       FROM movements GROUP BY customer_id
     )
-    SELECT COALESCE(SUM(GREATEST(balance,0)),0)::text closing,
-      COALESCE(SUM(invalid),0)::text invalid_count
-    FROM balances
+    SELECT c.id customer_id,c.customer_code,c.name customer_name,
+      COALESCE(b.balance,0)::text closing_gold_g,b.invalid::text invalid_count
+    FROM balances b JOIN customers c ON c.id=b.customer_id
+    ORDER BY c.name,c.customer_code
   `,[date]);
-  if(BigInt(debt.rows[0]?.invalid_count??'0')>0n)
+  if(debt.rows.some(row=>BigInt(row.invalid_count)>0n))
    throw new BadRequestException('Nợ vàng có loại giao dịch chưa định nghĩa, không thể tạo snapshot');
+  const customerDebts=debt.rows
+    .filter(row=>signed(row.closing_gold_g)>0n)
+    .map(row=>({customerId:row.customer_id,customerCode:row.customer_code,customerName:row.customer_name,closingGoldG:row.closing_gold_g}));
+  const closing=customerDebts.reduce((sum,item)=>sum+signed(item.closingGoldG),0n);
   return {
    workers:[...byWorker.values()],
-   customerDebt:debt.rows[0]?.closing??'0',
+   customerDebt:toDecimal(closing),
+   customerDebts,
    capturedAt:new Date().toISOString(),
    businessDate:date,
   };
