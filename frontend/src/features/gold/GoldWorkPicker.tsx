@@ -50,8 +50,8 @@ export function GoldWorkPicker({ worker, available, open, onCancel, onApply }: {
         <span aria-hidden="true" />
         <span>NGÀY CÔNG VIỆC</span>
         <span>CÔNG VIỆC</span>
+        <span>GIAO (g)</span>
         <span>NHẬN (g)</span>
-        <span>TRẢ (g)</span>
         <span>HAO/HEO (g)</span>
       </div>
       {visible.length === 0 ? <Empty description="Không có công việc phù hợp trong dữ liệu đã lấy" /> : visible.map(job=>{
