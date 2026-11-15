@@ -6,6 +6,7 @@ import { LeftOutlined, RightOutlined, ReloadOutlined, InfoCircleOutlined, Settin
 import { GoldScaleTable, GoldBagsTable, GoldLabelsTable, GoldOtherTable, numberOrNull, sumGold, formatGold, NO_BOX_ID, type GoldScaleRow, type GoldAmountRow, type GoldOtherRow } from './GoldDailyTables'
 import { GoldWorkerCard, type GoldWorker, type GoldWork } from './GoldWorkerCard'
 import { GoldWorkPicker } from './GoldWorkPicker'
+import { GOLD_DEMO_PREVIOUS, goldDemoOffset, isGoldDemoDate } from './goldDemoFigures'
 import { GoldDaySummary } from './GoldDaySummary'
 import { GoldLayoutSettings, type LayoutSaveScope } from './GoldLayoutSettings'
 import { INITIAL_GOLD_TEMPLATE, cloneGoldTemplate, effectiveGoldTemplate, upsertTemplateVersion, type GoldLayoutTemplate, type GoldTemplateVersion } from './goldLayoutTemplate'
@@ -44,7 +45,7 @@ const emptyScales = () => Array.from({length:6},():GoldScaleRow=>({box:'',gross:
 const emptyOthers = () => Array.from({length:6},():GoldOtherRow=>({name:'',add:'',subtract:''}))
 const initialVersions: GoldTemplateVersion[] = [{effectiveFrom:'0001-01-01',template:cloneGoldTemplate(INITIAL_GOLD_TEMPLATE)}]
 function demoDay(date:string, template: GoldLayoutTemplate): GoldDay {
-  const show = date==='2026-09-29' || date===dateString(new Date())
+  const show = isGoldDemoDate(date)
   return {
     availableWorks: Object.fromEntries(WORKER_SLOTS.map(([id])=>[id,show?(SAMPLE_WORK[id]??[]).map(job=>({...job})):[]])),
     workers: WORKER_SLOTS.map(([id,name])=>({id,name,jobs:show?(SAMPLE_WORK[id]??[]).filter(job=>(SAMPLE_SELECTED_IDS[id]??[]).includes(job.id)).map(job=>({...job})):[]})),
@@ -52,8 +53,8 @@ function demoDay(date:string, template: GoldLayoutTemplate): GoldDay {
     bags:[...template.bagWeights.map((unit,i)=>({name:'',unit,count:show?String([10,5,3,2,4][i]??''):''})),{name:'',unit:'',count:''}],
     labels:template.labelWeights.map((unit,i)=>({name:'',unit:show?(['0.40','0.80'][i]??unit):unit,count:show?(['10','5'][i]??''):''})),
     others:show?[{name:'Nhận bổ sung',add:'12.50',subtract:''},{name:'Điều chỉnh cân',add:'',subtract:'4.00'},...emptyOthers().slice(2)]:emptyOthers(),
-    debt:show?'2450.00':'0.00',
-    previous:show?'9100.00':null,
+    debt:show?(2450 + goldDemoOffset(date)).toFixed(2):'0.00',
+    previous:show?GOLD_DEMO_PREVIOUS.toFixed(2):null,
     layout:cloneGoldTemplate(template),
   }
 }
@@ -153,7 +154,7 @@ export function GoldDailyPreview() {
         <Tag color="blue">Bản xem trước</Tag>
       </div>
     </div>
-    <div className="gold-preview-note"><InfoCircleOutlined/> Dữ liệu và thiết lập mẫu hiện chỉ được lưu trong bộ nhớ trang; tải lại trình duyệt sẽ mất thay đổi. Chưa có API lưu phiên.</div>
+    <div className="gold-preview-note"><InfoCircleOutlined/> DỮ LIỆU MẪU: công việc, vàng cân và tổng kết chỉ phục vụ xem giao diện, không phải số liệu đã lưu. Thay đổi sẽ mất khi tải lại trang.</div>
     <div className="gold-page-layout">
       <div className="gold-main-sheet">
         <div className="gold-debt-card">
