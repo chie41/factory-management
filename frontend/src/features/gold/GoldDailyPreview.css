@@ -67,3 +67,25 @@
 @media(max-width:1250px){.gold-page-layout{grid-template-columns:minmax(0,1fr) 260px}.gold-workers-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.gold-table-pairs{grid-template-columns:1fr}}
 @media(max-width:800px){.gold-page-layout{display:flex;flex-direction:column}.gold-main-sheet,.gold-day-summary{width:100%}.gold-day-summary{position:static;max-height:none;overflow:visible}.gold-table-pairs{grid-template-columns:repeat(2,minmax(0,1fr))}.gold-page-heading{align-items:flex-start;flex-direction:column}}
 @media(max-width:650px){.gold-workers-grid,.gold-table-pairs{grid-template-columns:1fr}.gold-debt-card{grid-template-columns:1fr auto}.gold-debt-card>b{order:3;grid-column:1/-1;text-align:center}.gold-custom-fields label{grid-template-columns:1fr}}
+
+/* Align the customer debt amount with the worker total, both on the right edge. */
+.gold-debt-card{grid-template-columns:minmax(0,1fr) auto;min-height:68px}
+.gold-debt-amount{display:flex;align-items:flex-end;flex-direction:column;justify-content:center;min-width:170px;gap:0}
+.gold-debt-amount b{color:#172b4d;font-size:21px;font-weight:700;line-height:27px;white-space:nowrap}
+.gold-debt-amount .ant-btn{font-size:10px;line-height:15px;height:19px;padding:0;color:#1677ff}
+.gold-workers-heading{padding-right:4px}
+.gold-setup-section{border-top:1px solid #edf0f3;padding:14px 0;display:flex;flex-direction:column;gap:9px}
+.gold-setup-section>strong,.gold-setup-scope>strong{font-size:14px;color:#172b4d}
+.gold-setup-section .ant-typography-secondary,.gold-setup-scope .ant-typography-secondary{font-size:12px}
+.gold-setup-head,.gold-setup-row{display:grid;grid-template-columns:minmax(0,1fr) 200px 32px;gap:8px;align-items:center}
+.gold-setup-head{color:#667085;font-size:11px}
+.gold-setup-row .ant-input-number{width:100%;height:24px}
+.gold-setup-row .ant-input-number-input{height:22px;text-align:right}
+.gold-setup-section>.ant-btn{align-self:flex-start;padding-left:0}
+.gold-setup-chips{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.gold-setup-weight{min-width:0}
+.gold-setup-weight .ant-input-number{flex:1;min-width:0;height:24px}
+.gold-setup-weight .ant-input-number-input{height:22px;text-align:right}
+.gold-setup-scope{background:#f7f9fc;border-radius:7px;padding:14px;display:flex;flex-direction:column;gap:10px;margin-top:9px}
+.gold-custom-input{width:100%;min-height:30px;border:1px solid #cfcfcf;border-radius:4px;padding:4px 8px}
+@media(max-width:650px){.gold-debt-card{grid-template-columns:minmax(0,1fr) auto}.gold-debt-amount{min-width:0}.gold-setup-chips{grid-template-columns:repeat(2,minmax(0,1fr))}.gold-setup-head,.gold-setup-row{grid-template-columns:minmax(0,1fr) 120px 28px}}
