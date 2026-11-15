@@ -1,0 +1,65 @@
+{
+  "environment": "localhost development, API 3003 / Vite 5178",
+  "createdThrough": "UI only",
+  "customersCreated": 6,
+  "transactionsCreated": 15,
+  "audit": [
+    {
+      "balances": "NỢ VÀNG324,9600 gNỢ TIỀN CÔNG11.500.000,0000 VNDĐơn đang xử lý—Giao dịch gần nhất10:32 03/08/2026",
+      "customer": "Tiệm vàng Minh Anh KH000007",
+      "entries": 4,
+      "notes": [
+        "E2E Minh Anh GH-0098 — tổng giao theo Figma, giao dịch thủ công",
+        "E2E Minh Anh trả vàng — đã sửa từ 420 g thành 400 g",
+        "E2E Minh Anh GH-0107 — 182.40 g, lần giao thứ hai",
+        "E2E Minh Anh trả thêm 20 g từ Tổng hợp"
+      ]
+    },
+    {
+      "balances": "NỢ VÀNG150,0000 gNỢ TIỀN CÔNG0,0000 VNDĐơn đang xử lý—Giao dịch gần nhất11:00 02/08/2026",
+      "customer": "Kim Phát Jewelry KH000008",
+      "entries": 2,
+      "notes": [
+        "E2E Kim Phát giao hàng — chỉ còn nợ vàng",
+        "E2E Kim Phát trả vàng — 100 g"
+      ]
+    },
+    {
+      "balances": "NỢ VÀNG0,0000 gNỢ TIỀN CÔNG3.500.000,0000 VNDĐơn đang xử lý—Giao dịch gần nhất13:00 02/08/2026",
+      "customer": "Vạn Phúc KH000009",
+      "entries": 2,
+      "notes": [
+        "E2E Vạn Phúc giao hàng — tiền công chưa thanh toán",
+        "E2E Vạn Phúc trả đủ vàng — chỉ còn nợ tiền công"
+      ]
+    },
+    {
+      "balances": "NỢ VÀNG0,0000 gNỢ TIỀN CÔNG0,0000 VNDĐơn đang xử lý—Giao dịch gần nhất14:00 03/08/2026",
+      "customer": "Phú Quý KH000010",
+      "entries": 2,
+      "notes": [
+        "E2E Phú Quý giao hàng — đã thanh toán tiền công",
+        "E2E Phú Quý trả đủ vàng — không còn công nợ"
+      ]
+    },
+    {
+      "balances": "NỢ VÀNG100,0000 gNỢ TIỀN CÔNG500.000,0000 VNDĐơn đang xử lý—Giao dịch gần nhất10:00 12/10/2026",
+      "customer": "An Khang KH000011",
+      "entries": 2,
+      "notes": [
+        "E2E An Khang giao hàng hôm nay — công nợ hỗn hợp",
+        "E2E An Khang trả vàng hôm nay — 20 g"
+      ]
+    },
+    {
+      "balances": "NỢ VÀNG25,0000 gNỢ TIỀN CÔNG0,0000 VNDĐơn đang xử lý—Giao dịch gần nhất11:00 05/08/2026",
+      "customer": "Latsamy KH000012",
+      "entries": 3,
+      "notes": [
+        "E2E Latsamy giao hàng — đã trả tiền công",
+        "E2E Latsamy trả vàng — 50 g",
+        "E2E Latsamy trả thêm 5 g — kiểm tra footer cố định"
+      ]
+    }
+  ]
+}

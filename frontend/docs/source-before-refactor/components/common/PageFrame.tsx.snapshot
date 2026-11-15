@@ -1,0 +1,14 @@
+import type { ReactNode } from 'react'
+import { Button, Typography } from 'antd'
+import { PlusOutlined } from '@ant-design/icons'
+export function PageFrame({ title, subtitle, action, children, compact = false }: { title: string; subtitle: string; action: string; children: ReactNode; compact?: boolean }) {
+  return (
+    <section className={`workspace-page ${compact ? 'compact' : ''}`}>
+      <div className="page-title-row">
+        <div><Typography.Title>{title}</Typography.Title><Typography.Text>{subtitle}</Typography.Text></div>
+        <Button type="primary" icon={<PlusOutlined />}>{action}</Button>
+      </div>
+      {children}
+    </section>
+  )
+}

@@ -1,0 +1,16 @@
+export type Employee = {
+  id: string
+  code?: string
+  employeeCode?: string
+  username?: string
+  fullName?: string
+  name?: string
+  phone?: string
+  phoneNumber?: string
+  roles?: Array<string | { name?: string }>
+  status?: string
+  isActive?: boolean
+  currentWork?: string
+  joinedAt?: string
+  createdAt?: string
+}

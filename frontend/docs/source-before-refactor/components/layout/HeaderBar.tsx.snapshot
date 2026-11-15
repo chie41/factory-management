@@ -1,0 +1,12 @@
+import { BellOutlined } from '@ant-design/icons'
+import { Badge, Button } from 'antd'
+import type { PageKey } from '../../types/models'
+export function HeaderBar({ page }: { page: PageKey }) {
+  const label = page === 'employees' ? 'Danh bạ / Nhân viên' : page === 'customers' ? 'Danh bạ / Khách hàng' : 'Trang chủ / Giao hàng'
+  return (
+    <header className="topbar">
+      <span>{label}</span>
+      <Badge count={3} size="small"><Button icon={<BellOutlined />}>Thông báo</Button></Badge>
+    </header>
+  )
+}

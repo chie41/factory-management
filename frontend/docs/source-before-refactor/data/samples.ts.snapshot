@@ -1,0 +1,31 @@
+import type { Employee, Customer, LedgerSummary, LedgerEntry } from '../types/models'
+export const sampleEmployees: Employee[] = [
+  { id: '1', code: 'NV-001', fullName: 'Trần Văn Nhạ', phone: '0900 000 001', roles: ['Thợ'], status: 'Đang hoạt động', currentWork: '2 công việc đang làm', joinedAt: '2023-03-01' },
+  { id: '2', code: 'NV-021', fullName: 'Nguyễn Văn An', phone: '0900 000 002', roles: ['Thợ'], status: 'Đang hoạt động', currentWork: 'SX-0091 · Hàn', joinedAt: '2024-03-15' },
+  { id: '3', code: 'NV-003', fullName: 'Lê Văn Bình', phone: '0900 000 003', roles: ['Thợ'], status: 'Đang hoạt động', currentWork: '2 công việc đang làm', joinedAt: '2023-06-01' },
+  { id: '4', code: 'NV-004', fullName: 'Phạm Văn Khoa', phone: '0900 000 004', roles: ['Thợ'], status: 'Đang hoạt động', currentWork: 'SX-0095 · Móc xích', joinedAt: '2023-08-15' },
+  { id: '5', code: 'NV-005', fullName: 'Trần Quốc Hùng', phone: '0900 000 005', roles: ['Thợ'], status: 'Đang hoạt động', currentWork: 'SX-0096 · Hoàn thiện', joinedAt: '2024-01-02' },
+  { id: '6', code: 'NV-006', fullName: 'Nguyễn Minh Tuấn', phone: '0900 000 006', roles: ['Thợ'], status: 'Đang hoạt động', currentWork: 'SX-0097 · Hàn', joinedAt: '2024-02-10' },
+  { id: '7', code: 'NV-007', fullName: 'Võ Văn Dũng', phone: '0900 000 007', roles: ['Thợ'], status: 'Ngừng hoạt động', currentWork: '—', joinedAt: '2024-04-01' },
+  { id: '8', code: 'NV-008', fullName: 'Nguyễn Thị Lan', phone: '0900 000 008', roles: ['Thợ'], status: 'Đang hoạt động', currentWork: 'SX-0098 · Chuẩn bị', joinedAt: '2024-06-15' },
+]
+export const sampleCustomers: Customer[] = [
+  { id: 'c1', code: 'KH-001', name: 'Tiệm vàng Minh Anh', phone: '020 555 0198', address: '128 đường Samsenthai, Viêng Chăn', status: 'Đang hoạt động' },
+  { id: 'c2', code: 'KH-014', name: 'Kim Phát Jewelry', phone: '020 555 0231', address: 'Chợ Sáng, Viêng Chăn', status: 'Đang hoạt động' },
+  { id: 'c3', code: 'KH-028', name: 'Vạn Phúc', phone: '020 555 0188', address: 'Sisattanak', status: 'Có công nợ' },
+  { id: 'c4', code: 'KH-033', name: 'Phú Quý', phone: '020 555 0911', address: 'Luang Prabang', status: 'Đang hoạt động' },
+  { id: 'c5', code: 'KH-041', name: 'An Khang', phone: '020 555 0170', address: 'Savannakhet', status: 'Có công nợ' },
+]
+export const sampleLedger: LedgerSummary[] = [
+  { id: 'c1', customerId: 'c1', customerCode: 'KH-001', customerName: 'Tiệm vàng Minh Anh', lastTransactionAt: 'Hôm nay 10:32', goldDebtGram: 8420, laborDebtAmount: 12500000, processingOrders: 2, latestDeliveryCode: 'GH-0098', status: 'Có công nợ' },
+  { id: 'c2', customerId: 'c2', customerCode: 'KH-014', customerName: 'Kim Phát Jewelry', lastTransactionAt: 'Hôm nay 09:18', goldDebtGram: 2160, laborDebtAmount: 0, processingOrders: 1, latestDeliveryCode: 'GH-0096', status: 'Có công nợ' },
+  { id: 'c3', customerId: 'c3', customerCode: 'KH-028', customerName: 'Vạn Phúc', lastTransactionAt: 'Hôm qua 16:45', goldDebtGram: 0, laborDebtAmount: 6800000, processingOrders: 3, latestDeliveryCode: 'GH-0092', status: 'Có công nợ' },
+  { id: 'c4', customerId: 'c4', customerCode: 'KH-033', customerName: 'Phú Quý', lastTransactionAt: '16/09/2026', goldDebtGram: 0, laborDebtAmount: 0, processingOrders: 1, latestDeliveryCode: 'GH-0088', status: 'Đang hoạt động' },
+  { id: 'c5', customerId: 'c5', customerCode: 'KH-041', customerName: 'An Khang', lastTransactionAt: '15/09/2026', goldDebtGram: 1050, laborDebtAmount: 1200000, processingOrders: 0, latestDeliveryCode: 'GH-0081', status: 'Có công nợ' },
+]
+export const sampleEntries: LedgerEntry[] = [
+  { id: 'e1', date: '01/08/2026', referenceCode: 'GH-0098', actorName: 'Vinh', type: 'Giao hàng', deliverGram: 562.56, productName: 'Dây XO 22,5', productCount: 5, laborDueAmount: 11375000, laborPaidAmount: 0, note: 'Giao đủ' },
+  { id: 'e2', date: '01/08/2026', referenceCode: 'GH-0100', actorName: 'Bounmy', type: 'Giao hàng', deliverGram: 325.4, productName: 'Dây Trơn 3B', productCount: 4, laborDueAmount: 6250000, laborPaidAmount: 2000000, note: 'Đã giao' },
+  { id: 'e3', date: '03/08/2026', referenceCode: 'TH-0012', actorName: 'Vinh', type: 'Trả hàng', receiveGram: 105, productName: 'Nhẫn nữ', productCount: 1, laborDueAmount: 0, laborPaidAmount: 0, note: 'Nhận lại' },
+  { id: 'e4', date: '04/08/2026', referenceCode: 'GH-0105', actorName: 'Bounmy', type: 'Giao hàng', deliverGram: 415.5, productName: 'Dây XO 5B', productCount: 3, laborDueAmount: 8300000, laborPaidAmount: 5000000, note: 'Đã ký nhận' },
+]

@@ -1,0 +1,41 @@
+import { UserOutlined } from '@ant-design/icons'
+import { Button, Card, ConfigProvider, Form, Input, Statistic, Typography } from 'antd'
+import { gram, money } from '../utils/format'
+export function LoginPage({ onLogin }: { onLogin: (values: { username: string; password: string }) => Promise<void> }) {
+  return (
+    <ConfigProvider theme={{ token: { colorPrimary: '#1946f2', borderRadius: 6, fontFamily: 'Inter, system-ui, Segoe UI, sans-serif' } }}>
+      <div className="login-screen">
+        <section className="login-panel">
+          <div className="brand-row large">
+            <div className="brand-mark">QX</div>
+            <div>
+              <strong>QUẢN LÝ XƯỞNG</strong>
+              <span>Vận hành tinh gọn</span>
+            </div>
+          </div>
+          <Typography.Title level={2}>Đăng nhập</Typography.Title>
+          <Typography.Paragraph>Truy cập hệ thống quản lý nhân viên, khách hàng và sổ giao dịch.</Typography.Paragraph>
+          <Form layout="vertical" onFinish={onLogin} requiredMark={false} initialValues={{ username: 'admin' }}>
+            <Form.Item name="username" label="Tên đăng nhập" rules={[{ required: true, message: 'Nhập tên đăng nhập' }]}>
+              <Input size="large" prefix={<UserOutlined />} placeholder="admin" />
+            </Form.Item>
+            <Form.Item name="password" label="Mật khẩu" rules={[{ required: true, message: 'Nhập mật khẩu' }]}>
+              <Input.Password size="large" placeholder="••••••••" />
+            </Form.Item>
+            <Button type="primary" htmlType="submit" size="large" block>
+              Đăng nhập
+            </Button>
+          </Form>
+        </section>
+        <section className="login-visual">
+          <Card>
+            <Statistic title="Khách có giao dịch trong kỳ" value={48} />
+            <div className="mini-ledger-row"><span>Tiệm vàng Minh Anh</span><b>{gram(8420)}</b></div>
+            <div className="mini-ledger-row"><span>Kim Phát Jewelry</span><b>{gram(2160)}</b></div>
+            <div className="mini-ledger-row"><span>Vạn Phúc</span><b>{money(6800000)}</b></div>
+          </Card>
+        </section>
+      </div>
+    </ConfigProvider>
+  )
+}

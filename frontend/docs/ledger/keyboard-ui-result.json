@@ -1,0 +1,20 @@
+{
+  "scenario": "20 delivery lines + return gold + gold return to customer; keyboard only; mocked API; no DB write",
+  "entries": [
+    {
+      "type": "DELIVERY",
+      "lines": 20
+    },
+    {
+      "type": "RETURN_GOLD",
+      "lines": 0,
+      "gold": "1.2345"
+    },
+    {
+      "type": "GOLD_RETURN_TO_CUSTOMER",
+      "lines": 0,
+      "gold": "0.4321"
+    }
+  ],
+  "focusAssertions": 307
+}

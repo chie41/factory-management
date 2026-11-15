@@ -1,0 +1,13 @@
+export type ApiList<T> = {
+  items?: T[]
+  data?: T[]
+  total?: number
+  meta?: { total?: number }
+}
+
+export function listFrom<T>(response: unknown, fallback: T[]): { rows: T[]; total: number } {
+  const payload = response as ApiList<T> | T[]
+  if (Array.isArray(payload)) return { rows: payload, total: payload.length }
+  const rows = payload.items ?? payload.data ?? fallback
+  return { rows, total: payload.total ?? payload.meta?.total ?? rows.length }
+}

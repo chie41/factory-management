@@ -1,0 +1,51 @@
+import { BookOutlined, CustomerServiceOutlined, DatabaseOutlined, DollarOutlined, HomeOutlined, LogoutOutlined, MenuFoldOutlined, ProductOutlined, SettingOutlined, ShopOutlined, TeamOutlined, ToolOutlined, UserOutlined } from '@ant-design/icons'
+import { Avatar, Button } from 'antd'
+import type { PageKey, UserProfile } from '../../types/models'
+import { initials } from '../../utils/format'
+export function Sidebar({ active, onChange, profile, onLogout }: { active: PageKey; onChange: (page: PageKey) => void; profile: UserProfile | null; onLogout: () => void }) {
+  const items = [
+    { type: 'label', label: 'KHÔNG GIAN LÀM VIỆC' },
+    { label: 'Dashboard', icon: <HomeOutlined /> },
+    { label: 'Đơn hàng', icon: <ShopOutlined /> },
+    { label: 'Giao hàng', icon: <CustomerServiceOutlined /> },
+    { label: 'Sản xuất', icon: <ToolOutlined /> },
+    { label: 'Mẫu mã', icon: <ProductOutlined /> },
+    { type: 'label', label: 'DANH BẠ' },
+    { key: 'customers' as const, label: 'Khách hàng', icon: <TeamOutlined /> },
+    { key: 'employees' as const, label: 'Nhân viên', icon: <UserOutlined /> },
+    { type: 'label', label: 'SỔ & QUẢN LÝ' },
+    { key: 'ledger' as const, label: 'Sổ giao dịch khách hàng', icon: <BookOutlined /> },
+    { label: 'Sổ lương thợ', icon: <DollarOutlined /> },
+    { label: 'Kho vật dụng', icon: <DatabaseOutlined /> },
+    { label: 'Vàng', icon: <DollarOutlined /> },
+    { label: 'Thu / Chi', icon: <DollarOutlined /> },
+    { label: 'Báo cáo', icon: <MenuFoldOutlined /> },
+    { type: 'label', label: 'HỆ THỐNG' },
+    { label: 'Hệ thống', icon: <SettingOutlined /> },
+  ]
+  const displayName = profile?.fullName ?? profile?.name ?? profile?.username ?? 'Bounmy'
+  return (
+    <aside className="sidebar">
+      <div className="brand-row">
+        <div className="brand-mark">QX</div>
+        <div><strong>QUẢN LÝ XƯỞNG</strong><span>Vận hành tinh gọn</span></div>
+      </div>
+      <nav className="nav-list">
+        {items.map((item, index) =>
+          item.type === 'label' ? (
+            <div className="nav-label" key={`${item.label}-${index}`}>{item.label}</div>
+          ) : (
+            <button key={item.label} className={`nav-item ${item.key === active ? 'active' : ''}`} onClick={() => item.key && onChange(item.key)} type="button">
+              {item.icon}<span>{item.label}</span>
+            </button>
+          ),
+        )}
+      </nav>
+      <div className="account-card">
+        <Avatar size={30}>{initials(displayName)}</Avatar>
+        <div><strong>{displayName}</strong><span>Quản lý xưởng</span></div>
+        <Button type="text" icon={<LogoutOutlined />} onClick={onLogout} />
+      </div>
+    </aside>
+  )
+}

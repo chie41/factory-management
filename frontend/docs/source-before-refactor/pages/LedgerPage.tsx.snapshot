@@ -1,0 +1,70 @@
+import { SearchOutlined } from '@ant-design/icons'
+import { Button, Card, Input, Select, Space, Statistic, Tabs, Tag, Typography } from 'antd'
+import type { ColumnsType } from 'antd/es/table'
+import type { LedgerSummary, LedgerEntry } from '../types/models'
+import { useLedger } from '../hooks/useLedger'
+import { PageFrame } from '../components/common/PageFrame'
+import { FilterRow } from '../components/common/FilterRow'
+import { DataTable } from '../components/common/DataTable'
+import { Identity } from '../components/common/Identity'
+import { StatusTag } from '../components/common/StatusTag'
+import { dateText, gram, money } from '../utils/format'
+export function LedgerPage() {
+  const { summary, entries, activeCustomer, setActiveCustomer, loading } = useLedger()
+  const columns: ColumnsType<LedgerSummary> = [
+    { title: 'KHÁCH HÀNG', width: 190, render: (_, row) => <Identity name={row.customerName ?? row.name} code={row.customerCode ?? row.code} /> },
+    { title: 'GIAO DỊCH GẦN NHẤT', width: 140, render: (_, row) => dateText(row.lastTransactionAt ?? row.latestTransactionAt) },
+    { title: 'NỢ VÀNG', width: 110, render: (_, row) => <b className="gold-text">{gram(row.goldDebtGram ?? row.goldDebt)}</b> },
+    { title: 'NỢ TIỀN CÔNG', width: 140, render: (_, row) => <b className="debt-text">{money(row.laborDebtAmount ?? row.laborDebt)}</b> },
+    { title: 'ĐƠN ĐANG XỬ LÝ', width: 120, render: (_, row) => row.processingOrders ?? row.openOrders ?? 0 },
+    { title: 'GIAO HÀNG GẦN NHẤT', width: 140, render: (_, row) => <Button type="link">{row.latestDeliveryCode ?? '—'}</Button> },
+    { title: 'TRẠNG THÁI', width: 130, render: (_, row) => <StatusTag status={row.status ?? 'Đang hoạt động'} /> },
+    { title: 'HÀNH ĐỘNG', width: 110, render: (_, row) => <Button type="link" onClick={() => setActiveCustomer(row)}>Mở sổ</Button> },
+  ]
+  const entryColumns: ColumnsType<LedgerEntry> = [
+    { title: 'NGÀY', width: 110, render: (_, row) => dateText(row.date ?? row.createdAt) },
+    { title: 'THAM CHIẾU', width: 110, render: (_, row) => row.referenceCode ?? row.reference ?? '—' },
+    { title: 'NGƯỜI GIAO DỊCH', width: 130, render: (_, row) => row.actorName ?? row.createdByName ?? '—' },
+    { title: 'LOẠI GIAO DỊCH', width: 130, render: (_, row) => <Tag color="blue">{row.type ?? row.direction ?? 'Giao dịch'}</Tag> },
+    { title: 'NHẬN (-)', width: 100, render: (_, row) => gram(row.receiveGram ?? row.goldInGram) },
+    { title: 'GIAO (+)', width: 100, render: (_, row) => gram(row.deliverGram ?? row.goldOutGram) },
+    { title: 'TÊN / MẪU HÀNG', render: (_, row) => row.productName ?? '—' },
+    { title: 'SL', width: 70, render: (_, row) => row.productCount ?? '—' },
+    { title: 'TIỀN CÔNG PHẢI TRẢ', width: 150, render: (_, row) => money(row.laborDueAmount) },
+    { title: 'TIỀN CÔNG ĐÃ TRẢ', width: 150, render: (_, row) => money(row.laborPaidAmount) },
+    { title: 'GHI CHÚ', width: 120, render: (_, row) => row.note ?? '—' },
+  ]
+  const debtCustomers = summary.filter((row) => Number(row.laborDebtAmount ?? row.laborDebt ?? 0) > 0).length
+  const goldDebtCustomers = summary.filter((row) => Number(row.goldDebtGram ?? row.goldDebt ?? 0) > 0).length
+  return (
+    <PageFrame title="Sổ giao dịch khách hàng" subtitle="Theo dõi giao dịch và công nợ của từng khách hàng" action="Thêm giao dịch" compact>
+      <Tabs items={[{ key: 'summary', label: 'Tổng hợp' }, { key: 'detail', label: `${activeCustomer.customerName ?? activeCustomer.name ?? 'Tiệm vàng Minh Anh'} ×` }]} />
+      <div className="stats-grid">
+        <Card><Statistic value={summary.length || 48} title="Khách có giao dịch trong kỳ" /></Card>
+        <Card><Statistic value={debtCustomers || 12} title="Khách đang nợ tiền công" valueStyle={{ color: '#c7292e' }} /></Card>
+        <Card><Statistic value={goldDebtCustomers || 8} title="Khách đang nợ vàng" valueStyle={{ color: '#c7730d' }} /></Card>
+        <Card><Statistic value={26} title="Giao dịch hôm nay" valueStyle={{ color: '#1946f2' }} /></Card>
+      </div>
+      <FilterRow compact>
+        <Input prefix={<SearchOutlined />} placeholder="Search khách hàng" />
+        <Select defaultValue="time" options={[{ value: 'time', label: 'Thời gian' }]} />
+        <Select defaultValue="active" options={[{ value: 'active', label: 'Đang hoạt động' }]} />
+        <Select defaultValue="debt" options={[{ value: 'debt', label: 'Có công nợ' }]} />
+      </FilterRow>
+      <DataTable columns={columns} dataSource={summary} loading={loading} rowKey={(row) => row.customerId ?? row.id ?? row.customerCode ?? row.customerName ?? Math.random().toString()} />
+      <section className="ledger-detail">
+        <div className="customer-heading">
+          <div><Typography.Title level={3}>{activeCustomer.customerName ?? activeCustomer.name ?? 'Tiệm vàng Minh Anh'} <Tag>{activeCustomer.customerCode ?? activeCustomer.code ?? 'KH-001'}</Tag></Typography.Title><Typography.Text>020 555 0198 · 128 đường Samsenthai, Viêng Chăn</Typography.Text></div>
+          <Space><Button type="primary">+ Thêm giao dịch</Button><Button>Xuất sổ</Button><Button>In</Button></Space>
+        </div>
+        <div className="stats-grid customer-balance">
+          <Card><Statistic title="NỢ VÀNG" value={gram(activeCustomer.goldDebtGram ?? activeCustomer.goldDebt)} /></Card>
+          <Card><Statistic title="NỢ TIỀN CÔNG" value={money(activeCustomer.laborDebtAmount ?? activeCustomer.laborDebt)} /></Card>
+          <Card><Statistic title="ĐƠN ĐANG XỬ LÝ" value={activeCustomer.processingOrders ?? activeCustomer.openOrders ?? 2} /></Card>
+          <Card><Statistic title="GIAO DỊCH GẦN NHẤT" value={dateText(activeCustomer.lastTransactionAt ?? activeCustomer.latestTransactionAt)} /></Card>
+        </div>
+        <DataTable columns={entryColumns} dataSource={entries} rowKey={(row) => row.id} scroll={{ x: 1280 }} />
+      </section>
+    </PageFrame>
+  )
+}

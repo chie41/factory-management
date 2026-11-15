@@ -1,0 +1,33 @@
+import { useEffect, useState } from 'react'
+import type { LedgerSummary, LedgerEntry } from '../types/models'
+import { sampleLedger, sampleEntries } from '../data/samples'
+import { api } from '../services/api'
+import { listFrom } from '../utils/listFrom'
+export function useLedger() {
+  const [summary, setSummary] = useState<LedgerSummary[]>(sampleLedger)
+  const [entries, setEntries] = useState<LedgerEntry[]>(sampleEntries)
+  const [activeCustomer, setActiveCustomer] = useState(sampleLedger[0])
+  const [loading, setLoading] = useState(false)
+  useEffect(() => {
+    setLoading(true)
+    api.get('/customer-ledger/summary', { params: { page: 1, limit: 20 } })
+      .then((res) => {
+        const next = listFrom<LedgerSummary>(res.data, sampleLedger).rows
+        setSummary(next)
+        setActiveCustomer(next[0] ?? sampleLedger[0])
+      })
+      .catch(() => setSummary(sampleLedger))
+      .finally(() => setLoading(false))
+  }, [])
+  useEffect(() => {
+    const customerId = activeCustomer.customerId ?? activeCustomer.id
+    if (!customerId || customerId === 'c1') {
+      setEntries(sampleEntries)
+      return
+    }
+    api.get(`/customer-ledger/customers/${customerId}`)
+      .then((res) => setEntries(listFrom<LedgerEntry>(res.data, sampleEntries).rows))
+      .catch(() => setEntries(sampleEntries))
+  }, [activeCustomer])
+  return { summary, entries, activeCustomer, setActiveCustomer, loading }
+}

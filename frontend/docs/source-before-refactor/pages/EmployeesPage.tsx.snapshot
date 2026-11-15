@@ -1,0 +1,36 @@
+import { SearchOutlined } from '@ant-design/icons'
+import { Button, Input, Select, Typography } from 'antd'
+import type { ColumnsType } from 'antd/es/table'
+import type { Employee } from '../types/models'
+import { useEmployees } from '../hooks/useEmployees'
+import { PageFrame } from '../components/common/PageFrame'
+import { FilterRow } from '../components/common/FilterRow'
+import { DataTable } from '../components/common/DataTable'
+import { Identity } from '../components/common/Identity'
+import { StatusTag } from '../components/common/StatusTag'
+import { roleText } from '../utils/roleText'
+import { dateText } from '../utils/format'
+export function EmployeesPage() {
+  const { rows, loading, search, setSearch, filtered, activeCount } = useEmployees()
+  const columns: ColumnsType<Employee> = [
+    { title: 'NHÂN VIÊN', dataIndex: 'fullName', render: (_, row) => <Identity name={row.fullName ?? row.name ?? row.username} code={row.code ?? row.employeeCode} /> },
+    { title: 'MÃ NV', width: 88, render: (_, row) => row.code ?? row.employeeCode ?? '—' },
+    { title: 'VAI TRÒ', width: 132, render: (_, row) => roleText(row.roles) },
+    { title: 'SĐT', width: 126, render: (_, row) => row.phone ?? row.phoneNumber ?? '—' },
+    { title: 'CÔNG VIỆC HIỆN TẠI', width: 222, render: (_, row) => row.currentWork ?? '—' },
+    { title: 'TRẠNG THÁI', width: 162, render: (_, row) => <StatusTag status={row.status ?? (row.isActive === false ? 'Ngừng hoạt động' : 'Đang hoạt động')} /> },
+    { title: 'NGÀY VÀO LÀM', width: 120, render: (_, row) => dateText(row.joinedAt ?? row.createdAt) },
+    { title: '', width: 64, render: () => <Button type="link">Xem</Button> },
+  ]
+  return (
+    <PageFrame title="Nhân viên" subtitle="Quản lý hồ sơ và trạng thái nhân viên" action="Thêm nhân viên">
+      <Typography.Text className="summary-line">Tổng {rows.length} · Đang hoạt động {activeCount} · Ngừng hoạt động {rows.length - activeCount}</Typography.Text>
+      <FilterRow>
+        <Input prefix={<SearchOutlined />} placeholder="Tìm tên, mã nhân viên, số điện thoại..." value={search} onChange={(event) => setSearch(event.target.value)} />
+        <Select defaultValue="all" options={[{ value: 'all', label: 'Trạng thái: Tất cả' }, { value: 'active', label: 'Đang hoạt động' }]} />
+        <Select defaultValue="all" options={[{ value: 'all', label: 'Vai trò: Tất cả' }, { value: 'worker', label: 'Thợ' }]} />
+      </FilterRow>
+      <DataTable columns={columns} dataSource={filtered} loading={loading} rowKey={(row) => row.id} />
+    </PageFrame>
+  )
+}

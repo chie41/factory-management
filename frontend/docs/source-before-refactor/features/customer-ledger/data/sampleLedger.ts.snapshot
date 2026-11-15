@@ -1,0 +1,16 @@
+import type { LedgerEntry, LedgerSummary } from '../types/ledger'
+
+export const sampleLedger: LedgerSummary[] = [
+  { id: 'c1', customerId: 'c1', customerCode: 'KH-001', customerName: 'Tiệm vàng Minh Anh', lastTransactionAt: 'Hôm nay 10:32', goldDebtGram: 8420, laborDebtAmount: 12500000, processingOrders: 2, latestDeliveryCode: 'GH-0098', status: 'Có công nợ' },
+  { id: 'c2', customerId: 'c2', customerCode: 'KH-014', customerName: 'Kim Phát Jewelry', lastTransactionAt: 'Hôm nay 09:18', goldDebtGram: 2160, laborDebtAmount: 0, processingOrders: 1, latestDeliveryCode: 'GH-0096', status: 'Có công nợ' },
+  { id: 'c3', customerId: 'c3', customerCode: 'KH-028', customerName: 'Vạn Phúc', lastTransactionAt: 'Hôm qua 16:45', goldDebtGram: 0, laborDebtAmount: 6800000, processingOrders: 3, latestDeliveryCode: 'GH-0092', status: 'Có công nợ' },
+  { id: 'c4', customerId: 'c4', customerCode: 'KH-033', customerName: 'Phú Quý', lastTransactionAt: '16/09/2026', goldDebtGram: 0, laborDebtAmount: 0, processingOrders: 1, latestDeliveryCode: 'GH-0088', status: 'Đang hoạt động' },
+  { id: 'c5', customerId: 'c5', customerCode: 'KH-041', customerName: 'An Khang', lastTransactionAt: '15/09/2026', goldDebtGram: 1050, laborDebtAmount: 1200000, processingOrders: 0, latestDeliveryCode: 'GH-0081', status: 'Có công nợ' },
+]
+
+export const sampleEntries: LedgerEntry[] = [
+  { id: 'e1', date: '01/08/2026', referenceCode: 'GH-0098', actorName: 'Vinh', type: 'Giao hàng', deliverGram: 562.56, productName: 'Dây XO 22,5', productCount: 5, laborDueAmount: 11375000, laborPaidAmount: 0, note: 'Giao đủ' },
+  { id: 'e2', date: '01/08/2026', referenceCode: 'GH-0100', actorName: 'Bounmy', type: 'Giao hàng', deliverGram: 325.4, productName: 'Dây Trơn 3B', productCount: 4, laborDueAmount: 6250000, laborPaidAmount: 2000000, note: 'Đã giao' },
+  { id: 'e3', date: '03/08/2026', referenceCode: 'TH-0012', actorName: 'Vinh', type: 'Trả hàng', receiveGram: 105, productName: 'Nhẫn nữ', productCount: 1, laborDueAmount: 0, laborPaidAmount: 0, note: 'Nhận lại' },
+  { id: 'e4', date: '04/08/2026', referenceCode: 'GH-0105', actorName: 'Bounmy', type: 'Giao hàng', deliverGram: 415.5, productName: 'Dây XO 5B', productCount: 3, laborDueAmount: 8300000, laborPaidAmount: 5000000, note: 'Đã ký nhận' },
+]

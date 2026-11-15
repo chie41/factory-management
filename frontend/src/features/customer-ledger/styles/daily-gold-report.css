@@ -1,0 +1,99 @@
+.ledger-summary-modes { margin-bottom: 16px; }
+.daily-gold-loading { display: flex; justify-content: center; padding: 12px; }
+.daily-gold-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.daily-gold-report { background: white; padding: 20px; color: #172332; }
+.daily-gold-report header { text-align: center; margin-bottom: 12px; break-inside: avoid; break-after: avoid; }
+.daily-gold-report h2 { font-size: 24px; line-height: 1.25; font-weight: 700; margin: 0 0 4px; }
+.daily-gold-report .daily-gold-report-date { margin: 0 0 4px; font-size: 20px; line-height: 1.25; font-weight: 600; }
+.daily-gold-report header small { color: #606b79; }
+.daily-gold-scroll { max-width: 100%; overflow-x: auto; }
+.daily-gold-report table { width: 100%; min-width: max(650px, calc(var(--gold-report-columns, 4) * 95px + 230px)); border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.daily-gold-report th, .daily-gold-report td { border: 1px solid #8e99a6; padding: 9px 12px; text-align: right; white-space: nowrap; }
+.daily-gold-report th { background: #edf0f4; font-size: 12px; }
+.daily-gold-report .gold-report-index { text-align: center; }
+.daily-gold-report .gold-report-customer { text-align: left; white-space: normal; }
+.daily-gold-report .gold-report-group { text-align: center; }
+.daily-gold-report thead th { padding-block: 8px; line-height: 18px; vertical-align: middle; }
+.daily-gold-report th.gold-report-delivered { background: #ffe1b6; }
+.daily-gold-report th.gold-report-received { background: #d6efdb; }
+.daily-gold-report tfoot { font-weight: 700; background: #f0f3f6; }
+.daily-gold-report .gold-report-total-label { text-align: left; }
+.daily-gold-empty { padding: 20px; }
+.daily-gold-print-help { margin: 0 0 12px; color: #606b79; font-size: 12px; line-height: 1.5; }
+.daily-gold-print { display: none; }
+@media print {
+  @page gold-day {
+    size: A4 portrait;
+    margin: 10mm;
+    /* Author-defined margin boxes only. Browser headers/footers must be
+       disabled separately in its print dialog. */
+    @top-left { content: none; }
+    @top-center { content: none; }
+    @top-right { content: none; }
+    @bottom-left { content: none; }
+    @bottom-center { content: none; }
+    @bottom-right {
+      content: counter(page) "/" counter(pages);
+      font-family: Arial, sans-serif;
+      font-size: 8pt;
+      font-weight: normal;
+      color: #333;
+      text-align: right;
+      vertical-align: middle;
+    }
+  }
+  /* Empty author margin boxes do not disable the browser's own header.
+     Chromium uses the first page's available margin to decide whether to
+     generate that header for the document. Keep later pages' safe margins. */
+  @page gold-day:first {
+    margin-top: 0;
+  }
+  html:has(body.printing-daily-gold) { min-height: 0; height: auto; margin: 0; padding: 0; background: white; }
+  body.printing-daily-gold { page: gold-day; background: white; min-width: 0; min-height: 0; height: auto; margin: 0; padding: 0; overflow: visible; break-after: auto; }
+  body.printing-daily-gold #root, body.printing-daily-gold .ant-app { min-height: 0; height: auto; max-height: none; margin: 0; padding: 0; overflow: visible; break-after: auto; }
+  body.printing-daily-gold .app-shell,
+  body.printing-daily-gold .main-shell,
+  body.printing-daily-gold .page-content { display: block; position: static; width: 100%; min-width: 0; height: auto; min-height: 0; max-height: none; overflow: visible; transform: none; background: white; box-shadow: none; margin: 0; padding: 0; break-before: auto; break-after: auto; }
+  body.printing-daily-gold .daily-gold-screen,
+  body.printing-daily-gold [hidden],
+  body.printing-daily-gold .desktop-navigation,
+  body.printing-daily-gold .workspace-header,
+  body.printing-daily-gold .ledger-page-header,
+  body.printing-daily-gold .customer-ledger-tabs,
+  body.printing-daily-gold .ledger-summary-modes,
+  body.printing-daily-gold .daily-gold-toolbar,
+  body.printing-daily-gold .daily-gold-print-help,
+  body.printing-daily-gold .daily-gold-empty,
+  body.printing-daily-gold .ant-alert,
+  body.printing-daily-gold .daily-gold-loading { display: none !important; }
+  body.printing-daily-gold .page-content,
+  body.printing-daily-gold .daily-gold-report { padding: 0 !important; margin: 0; }
+  body.printing-daily-gold .customer-ledger-page { display: block; gap: 0; }
+  body.printing-daily-gold .daily-gold-view,
+  body.printing-daily-gold .daily-gold-report,
+  body.printing-daily-gold .daily-gold-scroll { display: block; visibility: visible; position: static; height: auto; min-height: 0; max-height: none; overflow: visible; transform: none; filter: none; opacity: 1; }
+  body.printing-daily-gold .daily-gold-report table { min-width: 0; width: 100%; table-layout: fixed; font-size: var(--gold-print-font, 8.5pt); margin: 0; break-after: auto; }
+  body.printing-daily-gold .daily-gold-report th,
+  body.printing-daily-gold .daily-gold-report td { padding: 4px 3px; border: 1px solid #444; white-space: normal; overflow-wrap: anywhere; }
+  body.printing-daily-gold .daily-gold-print { display: block; margin: 0; padding: 0; }
+  body.printing-daily-gold .daily-gold-print-page { margin: 0; padding: 0; height: auto; min-height: 0; break-after: auto; }
+  /* Restore the first report heading's breathing room inside document flow,
+     not in the browser-owned header margin. This is not an overlay. */
+  body.printing-daily-gold .daily-gold-print-page:first-child > header { padding-top: 10mm; }
+  body.printing-daily-gold .daily-gold-print-page + .daily-gold-print-page { break-before: page; }
+  body.printing-daily-gold .daily-gold-print-note { margin: 0 0 6px; font-size: 8pt; line-height: 1.3; text-align: center; }
+  body.printing-daily-gold .gold-print-index-col { width: 4% !important; }
+  body.printing-daily-gold .gold-print-customer-col { width: 24% !important; }
+  body.printing-daily-gold .gold-print-balance-col { width: 17% !important; }
+  body.printing-daily-gold .gold-print-adjustment-col { width: 15% !important; }
+  body.printing-daily-gold .gold-print-movement-col { width: auto !important; }
+  body.printing-daily-gold .daily-gold-report td:not(.gold-report-customer) { word-break: normal; }
+  body.printing-daily-gold .daily-gold-report th { font-size: inherit; }
+  body.printing-daily-gold .daily-gold-report thead { display: table-header-group; }
+  body.printing-daily-gold .daily-gold-report tfoot { display: table-row-group; }
+  body.printing-daily-gold .daily-gold-report tr { break-inside: avoid; page-break-inside: avoid; }
+  body.printing-daily-gold .daily-gold-report th { background: #f3f3f3; color: black; }
+  body.printing-daily-gold .daily-gold-report thead th { padding-block: 5px; line-height: 1.25; }
+  body.printing-daily-gold .daily-gold-report th.gold-report-delivered { background: #ffe1b6; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  body.printing-daily-gold .daily-gold-report th.gold-report-received { background: #d6efdb; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}

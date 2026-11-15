@@ -1,0 +1,34 @@
+import { useState } from 'react'
+import { ConfigProvider, Layout, theme } from 'antd'
+import type { PageKey } from './types/models'
+import { useAuth } from './hooks/useAuth'
+import { Sidebar } from './components/layout/Sidebar'
+import { HeaderBar } from './components/layout/HeaderBar'
+import { LoginPage } from './pages/LoginPage'
+import { PageRouter } from './app/PageRouter'
+import './App.css'
+function App() {
+  const { token, profile, handleLogin, handleLogout } = useAuth()
+  const [page, setPage] = useState<PageKey>('employees')
+  if (!token) return <LoginPage onLogin={handleLogin} />
+  return (
+    <ConfigProvider
+      theme={{
+        algorithm: theme.defaultAlgorithm,
+        token: { colorPrimary: '#1946f2', borderRadius: 6, fontFamily: 'Inter, system-ui, Segoe UI, sans-serif' },
+        components: { Table: { headerBg: '#f9f9f9', headerColor: '#737373', fontSize: 12, cellPaddingBlock: 12 } },
+      }}
+    >
+      <Layout className="app-shell">
+        <Sidebar active={page} onChange={setPage} profile={profile} onLogout={handleLogout} />
+        <Layout className="main-shell">
+          <HeaderBar page={page} />
+          <main className="page-content">
+            <PageRouter page={page} />
+          </main>
+        </Layout>
+      </Layout>
+    </ConfigProvider>
+  )
+}
+export default App

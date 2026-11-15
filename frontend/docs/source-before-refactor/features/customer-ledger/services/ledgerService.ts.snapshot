@@ -1,0 +1,14 @@
+import { apiClient } from '../../../services/apiClient'
+import { listFrom } from '../../../types/api'
+import { sampleEntries, sampleLedger } from '../data/sampleLedger'
+import type { LedgerEntry, LedgerSummary } from '../types/ledger'
+
+export async function fetchLedgerSummary() {
+  const response = await apiClient.get('/customer-ledger/summary', { params: { page: 1, limit: 20 } })
+  return listFrom<LedgerSummary>(response.data, sampleLedger).rows
+}
+
+export async function fetchLedgerEntries(customerId: string) {
+  const response = await apiClient.get(`/customer-ledger/customers/${customerId}`)
+  return listFrom<LedgerEntry>(response.data, sampleEntries).rows
+}

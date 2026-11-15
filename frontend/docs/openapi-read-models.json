@@ -1,0 +1,1111 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Workshop FE response supplement",
+    "version": "1.1.0-proposed",
+    "description": "Response schemas defined from Figma by user authorization. Merge GET responses and schemas into the supplied Swagger; this does not modify backend routes or database."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api/v1"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/employees": {
+      "get": {
+        "summary": "Proposed response supplement; backend implementation pending where absent",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Employee"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Insufficient permission"
+          },
+          "404": {
+            "description": "Resource or backend endpoint unavailable"
+          }
+        }
+      }
+    },
+    "/employees/{id}": {
+      "get": {
+        "summary": "Proposed response supplement; backend implementation pending where absent",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Employee"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Insufficient permission"
+          },
+          "404": {
+            "description": "Resource or backend endpoint unavailable"
+          }
+        }
+      }
+    },
+    "/employees/{id}/work": {
+      "get": {
+        "summary": "Proposed response supplement; backend implementation pending where absent",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "assignments"
+                      ],
+                      "properties": {
+                        "assignments": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/WorkRow"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Insufficient permission"
+          },
+          "404": {
+            "description": "Resource or backend endpoint unavailable"
+          }
+        }
+      }
+    },
+    "/employees/{id}/payroll": {
+      "get": {
+        "summary": "Proposed response supplement; backend implementation pending where absent",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "periods"
+                      ],
+                      "properties": {
+                        "periods": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/PayrollPeriod"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Insufficient permission"
+          },
+          "404": {
+            "description": "Resource or backend endpoint unavailable"
+          }
+        }
+      }
+    },
+    "/employees/{id}/supplies": {
+      "get": {
+        "summary": "Proposed response supplement; backend implementation pending where absent",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "held",
+                        "history"
+                      ],
+                      "properties": {
+                        "held": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/SuppliesRow"
+                          }
+                        },
+                        "history": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/SuppliesRow"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Insufficient permission"
+          },
+          "404": {
+            "description": "Resource or backend endpoint unavailable"
+          }
+        }
+      }
+    },
+    "/employees/{id}/activity": {
+      "get": {
+        "summary": "Proposed response supplement; backend implementation pending where absent",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ActivityRow"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Insufficient permission"
+          },
+          "404": {
+            "description": "Resource or backend endpoint unavailable"
+          }
+        }
+      }
+    },
+    "/customer-ledgers/summary": {
+      "get": {
+        "summary": "Proposed response supplement; backend implementation pending where absent",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/LedgerSummary"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Insufficient permission"
+          },
+          "404": {
+            "description": "Resource or backend endpoint unavailable"
+          }
+        }
+      }
+    },
+    "/customers/{id}/ledger": {
+      "get": {
+        "summary": "Proposed response supplement; backend implementation pending where absent",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/LedgerBook"
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Pagination"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Insufficient permission"
+          },
+          "404": {
+            "description": "Resource or backend endpoint unavailable"
+          }
+        }
+      }
+    },
+    "/customer-ledger-entries/{id}": {
+      "get": {
+        "summary": "Proposed response supplement; backend implementation pending where absent",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "data"
+                  ],
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/LedgerEntry"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Insufficient permission"
+          },
+          "404": {
+            "description": "Resource or backend endpoint unavailable"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Pagination": {
+        "type": "object",
+        "required": [
+          "page",
+          "page_size",
+          "total",
+          "total_pages"
+        ],
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "page_size": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_pages": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "Employee": {
+        "type": "object",
+        "required": [
+          "id",
+          "code",
+          "name",
+          "phone",
+          "role",
+          "status",
+          "start_date",
+          "note",
+          "currentWork"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "role": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "currentWork": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "WorkRow": {
+        "type": "object",
+        "required": [
+          "id",
+          "assignment_code",
+          "assignment_date",
+          "description",
+          "gold_issued_g",
+          "gold_received_g",
+          "variance_g",
+          "labor_amount",
+          "currency",
+          "status",
+          "note"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "assignment_code": {
+            "type": "string"
+          },
+          "assignment_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "description": {
+            "type": "string"
+          },
+          "gold_issued_g": {
+            "type": "string",
+            "pattern": "^-?[0-9]+(?:\\.[0-9]{1,4})?$"
+          },
+          "gold_received_g": {
+            "type": "string",
+            "pattern": "^-?[0-9]+(?:\\.[0-9]{1,4})?$",
+            "nullable": true
+          },
+          "variance_g": {
+            "type": "string",
+            "pattern": "^-?[0-9]+(?:\\.[0-9]{1,4})?$",
+            "nullable": true
+          },
+          "labor_amount": {
+            "type": "string",
+            "pattern": "^-?[0-9]+(?:\\.[0-9]{1,4})?$",
+            "nullable": true
+          },
+          "currency": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "HOLDING",
+              "SETTLED",
+              "CANCELLED"
+            ]
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "PayrollLine": {
+        "type": "object",
+        "required": [
+          "id",
+          "date",
+          "type",
+          "description",
+          "source",
+          "reference",
+          "original_amount",
+          "original_currency",
+          "amount_thb",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "LABOR",
+              "BONUS",
+              "ALLOWANCE",
+              "ADVANCE",
+              "SUPPLIES",
+              "PENALTY",
+              "GOLD_VARIANCE",
+              "RECOVERY"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "original_amount": {
+            "type": "string",
+            "pattern": "^-?[0-9]+(?:\\.[0-9]{1,4})?$"
+          },
+          "original_currency": {
+            "type": "string"
+          },
+          "amount_thb": {
+            "type": "string",
+            "pattern": "^-?[0-9]+(?:\\.[0-9]{1,4})?$"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "PayrollPeriod": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "summary_thb",
+          "lines"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "summary_thb": {
+            "type": "object",
+            "required": [
+              "labor",
+              "bonus",
+              "allowance",
+              "advance",
+              "supplies",
+              "penalty",
+              "gold_variance",
+              "net"
+            ],
+            "properties": {
+              "labor": {
+                "type": "string",
+                "pattern": "^-?[0-9]+(?:\\.[0-9]{1,4})?$"
+              },
+              "bonus": {
+                "type": "string",
+                "pattern": "^-?[0-9]+(?:\\.[0-9]{1,4})?$"
+              },
+              "allowance": {
+                "type": "string",
+                "pattern": "^-?[0-9]+(?:\\.[0-9]{1,4})?$"
+              },
+              "advance": {
+                "type": "string",
+                "pattern": "^-?[0-9]+(?:\\.[0-9]{1,4})?$"
+              },
+              "supplies": {
+                "type": "string",
+                "pattern": "^-?[0-9]+(?:\\.[0-9]{1,4})?$"
+              },
+              "penalty": {
+                "type": "string",
+                "pattern": "^-?[0-9]+(?:\\.[0-9]{1,4})?$"
+              },
+              "gold_variance": {
+                "type": "string",
+                "pattern": "^-?[0-9]+(?:\\.[0-9]{1,4})?$"
+              },
+              "net": {
+                "type": "string",
+                "pattern": "^-?[0-9]+(?:\\.[0-9]{1,4})?$"
+              }
+            }
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PayrollLine"
+            }
+          }
+        }
+      },
+      "SuppliesRow": {
+        "type": "object",
+        "required": [
+          "id",
+          "supply_name",
+          "quantity",
+          "date",
+          "transaction_type",
+          "reference",
+          "amount",
+          "currency",
+          "payment_method"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "supply_name": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number",
+            "minimum": 0
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "transaction_type": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^-?[0-9]+(?:\\.[0-9]{1,4})?$"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "payment_method": {
+            "type": "string",
+            "enum": [
+              "IMMEDIATE",
+              "PAYROLL_DEDUCTION"
+            ]
+          }
+        }
+      },
+      "ActivityRow": {
+        "type": "object",
+        "required": [
+          "id",
+          "occurred_at",
+          "description",
+          "actor_name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "description": {
+            "type": "string"
+          },
+          "actor_name": {
+            "type": "string"
+          }
+        }
+      },
+      "LedgerTotals": {
+        "type": "object",
+        "required": [
+          "active_entries",
+          "reversed_entries",
+          "gold_debt_balance_g",
+          "labor_by_currency"
+        ],
+        "properties": {
+          "active_entries": {
+            "type": "integer"
+          },
+          "reversed_entries": {
+            "type": "integer"
+          },
+          "gold_debt_balance_g": {
+            "type": "string",
+            "pattern": "^-?[0-9]+(?:\\.[0-9]{1,4})?$"
+          },
+          "labor_by_currency": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "required": [
+                "due",
+                "paid",
+                "outstanding"
+              ],
+              "properties": {
+                "due": {
+                  "type": "string",
+                  "pattern": "^-?[0-9]+(?:\\.[0-9]{1,4})?$"
+                },
+                "paid": {
+                  "type": "string",
+                  "pattern": "^-?[0-9]+(?:\\.[0-9]{1,4})?$"
+                },
+                "outstanding": {
+                  "type": "string",
+                  "pattern": "^-?[0-9]+(?:\\.[0-9]{1,4})?$"
+                }
+              }
+            }
+          }
+        }
+      },
+      "LedgerCustomer": {
+        "type": "object",
+        "required": [
+          "id",
+          "customer_code",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customer_code": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "LedgerEntry": {
+        "type": "object",
+        "required": [
+          "id",
+          "customerId",
+          "businessDate",
+          "occurredAt",
+          "entry_type",
+          "amount",
+          "currency",
+          "gold_weight_grams",
+          "referenceType",
+          "referenceId",
+          "note",
+          "reversedAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "businessDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "entry_type": {
+            "type": "string",
+            "enum": [
+              "DELIVERY",
+              "PAYMENT",
+              "RETURN_GOODS",
+              "RETURN_GOLD",
+              "ADJUSTMENT"
+            ]
+          },
+          "amount": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "gold_weight_grams": {
+            "type": "number",
+            "nullable": true
+          },
+          "referenceType": {
+            "type": "string",
+            "nullable": true
+          },
+          "referenceId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "reversedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "reversedBy": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "gold_debt_change_g": {
+            "type": "string",
+            "pattern": "^-?[0-9]+(?:\\.[0-9]{1,4})?$",
+            "nullable": true
+          },
+          "gold_debt_running_balance_g": {
+            "type": "string",
+            "pattern": "^-?[0-9]+(?:\\.[0-9]{1,4})?$",
+            "nullable": true
+          }
+        }
+      },
+      "LedgerSummary": {
+        "type": "object",
+        "required": [
+          "customer",
+          "totals"
+        ],
+        "properties": {
+          "customer": {
+            "$ref": "#/components/schemas/LedgerCustomer"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/LedgerTotals"
+          }
+        }
+      },
+      "LedgerBook": {
+        "type": "object",
+        "required": [
+          "customer",
+          "totals",
+          "entries"
+        ],
+        "properties": {
+          "customer": {
+            "$ref": "#/components/schemas/LedgerCustomer"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/LedgerTotals"
+          },
+          "entries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LedgerEntry"
+            }
+          }
+        }
+      }
+    }
+  }
+}

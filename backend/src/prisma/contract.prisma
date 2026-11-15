@@ -1,0 +1,618 @@
+// use prisma-8
+
+// ==========================================
+// 1. ROLES
+// ==========================================
+model Role {
+  id   Uuid         @id @default(uuid())
+  code VarChar(50)  @unique
+  name VarChar(120)
+
+  userRoles       UserRole[]
+  rolePermissions RolePermission[]
+
+  @@map("roles")
+}
+
+// ==========================================
+// 2. PERMISSIONS
+// ==========================================
+model Permission {
+  id   Uuid         @id @default(uuid())
+  code VarChar(120) @unique
+  name VarChar(180)
+
+  rolePermissions  RolePermission[]
+  groupPermissions GroupPermission[]
+  userPermissions  UserPermission[]
+
+  @@map("permissions")
+}
+
+// ==========================================
+// 3. EMPLOYEES
+// ==========================================
+model Employee {
+  id           Uuid               @id @default(uuid())
+  employeeCode VarChar(50)        @unique @map("employee_code")
+  fullName     VarChar(180)       @map("full_name")
+  phone        VarChar(30)?
+  startDate    DateString?       @map("start_date")
+  roleLabel    VarChar(120)?      @map("role_label")
+  status       VarChar(30)        @default("ACTIVE")
+  note         String?
+  createdAt    TimestamptzString  @default(now()) @map("created_at")
+  updatedAt    TimestamptzString  @default(now()) @map("updated_at")
+  deletedAt    TimestamptzString? @map("deleted_at")
+
+  users User[]
+
+  @@map("employees")
+}
+
+// ==========================================
+// 4. USERS
+// ==========================================
+model User {
+  id           Uuid               @id @default(uuid())
+  username     VarChar(100)       @unique
+  passwordHash String             @map("password_hash")
+  employeeId   Uuid?              @map("employee_id")
+  status       VarChar(30)        @default("ACTIVE")
+  createdAt    TimestamptzString  @default(now()) @map("created_at")
+  updatedAt    TimestamptzString  @default(now()) @map("updated_at")
+  deletedAt    TimestamptzString? @map("deleted_at")
+
+  employeeLinkExempt Boolean @default(false) @map("employee_link_exempt")
+  failedLoginAttempts Int @default(0) @map("failed_login_attempts")
+  loginBlockedUntil TimestamptzString? @map("login_blocked_until")
+  passwordChangedAt TimestamptzString? @map("password_changed_at")
+
+  employee        Employee?        @relation(fields: [employeeId], references: [id])
+  userRoles       UserRole[]
+  userGroups      UserGroup[]
+  userPermissions UserPermission[]
+
+  ledgerCreates CustomerLedger[] @relation("LedgerCreatedBy")
+  ledgerUpdates  CustomerLedger[] @relation("LedgerUpdatedBy")
+  ledgerReverses CustomerLedger[] @relation("LedgerReversedBy")
+
+  @@index([employeeId], unique: true, where: "(deleted_at IS NULL)", map: "users_live_employee_unique")
+  @@map("users")
+}
+
+// ==========================================
+// 5. USER ROLES
+// ==========================================
+model UserRole {
+  userId Uuid @map("user_id")
+  roleId Uuid @map("role_id")
+
+  user User @relation(fields: [userId], references: [id])
+  role Role @relation(fields: [roleId], references: [id])
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
+// ==========================================
+// 6. ROLE PERMISSIONS
+// ==========================================
+model RolePermission {
+  roleId       Uuid @map("role_id")
+  permissionId Uuid @map("permission_id")
+
+  role       Role       @relation(fields: [roleId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+// ==========================================
+// 7. GROUPS
+// ==========================================
+model Group {
+  id        Uuid               @id @default(uuid())
+  code      VarChar(50)        @unique
+  name      VarChar(120)
+  deletedAt TimestamptzString? @map("deleted_at")
+
+  userGroups       UserGroup[]
+  groupPermissions GroupPermission[]
+
+  @@map("groups")
+}
+
+// ==========================================
+// 8. USER GROUPS
+// ==========================================
+model UserGroup {
+  userId  Uuid @unique @map("user_id")
+  groupId Uuid @map("group_id")
+
+  user  User  @relation(fields: [userId], references: [id])
+  group Group @relation(fields: [groupId], references: [id])
+
+  @@id([userId, groupId])
+  @@map("user_groups")
+}
+
+// ==========================================
+// 9. GROUP PERMISSIONS
+// ==========================================
+model GroupPermission {
+  groupId      Uuid @map("group_id")
+  permissionId Uuid @map("permission_id")
+
+  group      Group      @relation(fields: [groupId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([groupId, permissionId])
+  @@map("group_permissions")
+}
+
+// ==========================================
+// 10. USER PERMISSIONS
+// ==========================================
+model UserPermission {
+  userId       Uuid @map("user_id")
+  permissionId Uuid @map("permission_id")
+
+  user       User       @relation(fields: [userId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([userId, permissionId])
+  @@map("user_permissions")
+}
+
+// ==========================================
+// 11. CUSTOMERS
+// ==========================================
+model Customer {
+  id           Uuid               @id @default(uuid())
+  customerCode VarChar(50)        @unique @map("customer_code")
+  name         VarChar(180)
+  phone        VarChar(30)?
+  address      String?
+  status       VarChar(30)        @default("ACTIVE")
+  note         String?
+  createdAt    TimestamptzString  @default(now()) @map("created_at")
+  updatedAt    TimestamptzString  @default(now()) @map("updated_at")
+  deletedAt    TimestamptzString? @map("deleted_at")
+
+  ledgerEntries CustomerLedger[]
+
+  @@map("customers")
+}
+
+// ==========================================
+// 12. CUSTOMERS LEDGERS
+// ==========================================
+model CustomerLedger {
+  id                 Uuid               @id @default(uuid())
+
+  customerId         Uuid               @map("customer_id")
+  customer           Customer           @relation(fields: [customerId], references: [id])
+
+  businessDate       DateString         @map("business_date")
+  occurredAt         TimestamptzString  @map("occurred_at")
+
+  transactionType    VarChar(50)        @map("transaction_type")
+  goldWeightG        Numeric(20, 4)     @map("gold_weight_g")
+  actualWeightG Numeric(20, 4)? @map("actual_weight_g")
+  purityPercent Numeric(7, 4)? @map("purity_percent")
+  recoveredExactGoldG Numeric(30, 10)? @map("recovered_exact_gold_g")
+  requestId Uuid? @map("request_id")
+  approvalStatus VarChar(30) @default("LEGACY") @map("approval_status")
+  approvedBy Uuid? @map("approved_by")
+  approvedAt TimestamptzString? @map("approved_at")
+  createdBy Uuid? @map("created_by")
+  createdByUser User? @relation("LedgerCreatedBy", fields: [createdBy], references: [id])
+
+  laborAmountDue     Numeric(20, 4)     @default(0) @map("labor_amount_due")
+  laborAmountPaid    Numeric(20, 4)     @default(0) @map("labor_amount_paid")
+  laborCurrency      Char(3)?           @map("labor_currency")
+  laborPaymentStatus VarChar(30)        @default("UNPAID") @map("labor_payment_status")
+
+  referenceType      VarChar(50)?       @map("reference_type")
+  referenceId        Uuid?              @map("reference_id")
+
+  description        VarChar(255)?
+  note               String?
+
+  createdAt          TimestamptzString  @default(now()) @map("created_at")
+
+  updatedBy          Uuid?              @map("updated_by")
+  updatedAt          TimestamptzString? @map("updated_at")
+  updatedByUser      User?              @relation("LedgerUpdatedBy", fields: [updatedBy], references: [id])
+
+  reversedAt         TimestamptzString? @map("reversed_at")
+  reversedBy         Uuid?              @map("reversed_by")
+  reversedByUser     User?              @relation("LedgerReversedBy", fields: [reversedBy], references: [id])
+
+  @@index([customerId])
+  @@index([businessDate])
+  @@map("customers_ledger")
+}
+
+
+
+model DesignModel {
+ productionBatches ProductionBatch[]
+ workflowMode VarChar(10) @default("INHERIT") @map("workflow_mode")
+ workflowRevisions ProductionWorkflowRevision[]
+ groupId Uuid? @map("group_id")
+ group DesignModelGroup? @relation(fields:[groupId],references:[id])
+ id Uuid @id @default(uuid())
+ code VarChar(80) @unique
+ name VarChar(180)
+ status VarChar(30) @default("ACTIVE")
+ defaultLaborPricePer15g Numeric(20,4)? @map("default_labor_price_per_15g")
+ defaultLaborCurrency Char(3)? @map("default_labor_currency")
+ imageUrl String? @map("image_url")
+ weightG Numeric(20,4)? @map("weight_g")
+ designDescription String? @map("design_description")
+ note String?
+ createdAt TimestamptzString @default(now()) @map("created_at")
+ updatedAt TimestamptzString @default(now()) @map("updated_at")
+ createdBy Uuid? @map("created_by")
+ updatedBy Uuid? @map("updated_by")
+ boms Bom[]
+ @@map("design_models")
+}
+
+model ProductionBatch {
+ standardWeightPerUnitG Numeric(20,4)? @map("standard_weight_per_unit_g")
+ plannedStartAt TimestamptzString? @map("planned_start_at")
+ plannedEndAt TimestamptzString? @map("planned_end_at")
+ id Uuid @id @default(uuid())
+ code VarChar(50) @unique
+ designModelId Uuid @map("design_model_id")
+ designModel DesignModel @relation(fields:[designModelId],references:[id])
+ modelCodeSnapshot VarChar(80) @map("model_code_snapshot")
+ modelNameSnapshot VarChar(180) @map("model_name_snapshot")
+ plannedQuantity Int @map("planned_quantity")
+ productUnit VarChar(30) @default("PCS") @map("product_unit")
+ status VarChar(40) @default("DRAFT")
+ plannedStart DateString? @map("planned_start")
+ plannedEnd DateString? @map("planned_end")
+ actualStart TimestamptzString? @map("actual_start")
+ actualEnd TimestamptzString? @map("actual_end")
+ note String?
+ sourceRevisionId Uuid @map("source_revision_id")
+ sourceMetadata Json @map("source_metadata")
+ revision Int @default(1)
+ requestId Uuid @unique @map("request_id")
+ intentHash String @map("intent_hash")
+ createdBy Uuid @map("created_by")
+ updatedBy Uuid @map("updated_by")
+ createdAt TimestamptzString @default(now()) @map("created_at")
+ updatedAt TimestamptzString @default(now()) @map("updated_at")
+ snapshots BatchWorkflowSnapshot[]
+ steps BatchStep[]
+ statusHistory BatchStatusHistory[]
+ auditEvents BatchAuditEvent[]
+ @@index([designModelId,status],map:"production_batches_model_status_idx")
+ @@map("production_batches")
+}
+model BatchWorkflowSnapshot {
+ id Uuid @id @default(uuid())
+ batchId Uuid @map("batch_id")
+ batch ProductionBatch @relation(fields:[batchId],references:[id])
+ revision Int
+ definition Json
+ createdBy Uuid @map("created_by")
+ createdAt TimestamptzString @default(now()) @map("created_at")
+ @@unique([batchId,revision])
+ @@map("batch_workflow_snapshots")
+}
+model BatchStep {
+ estimatedDurationMinutes Int? @map("estimated_duration_minutes")
+ executionStatus VarChar(20) @default("NOT_STARTED") @map("execution_status")
+ completedQuantity Int @default(0) @map("completed_quantity")
+ executionFinishedAt TimestamptzString? @map("execution_finished_at")
+ executionLockedAt TimestamptzString? @map("execution_locked_at")
+ batchId Uuid @map("batch_id")
+ batch ProductionBatch @relation(fields:[batchId],references:[id])
+ stepId VarChar(80) @map("step_id")
+ displayOrder Int @map("display_order")
+ name VarChar(180)
+ description String @default("")
+ laborRatePer15g Numeric(20,4)? @map("labor_rate_per_15g")
+ requiresEmployeeConfirmation Boolean @default(false) @map("requires_employee_confirmation")
+ executionStartedAt TimestamptzString? @map("execution_started_at")
+ dependencies BatchStepDependency[] @relation("BatchDependencies")
+ dependents BatchStepDependency[] @relation("BatchDependents")
+ @@id([batchId,stepId])
+ @@map("batch_steps")
+}
+
+model BatchExecutionRequest {
+ requestId Uuid @id @map("request_id")
+ batchId Uuid @map("batch_id")
+ actorId Uuid @map("actor_id")
+ intentHash String @map("intent_hash")
+ result Json
+ createdAt TimestamptzString @default(now()) @map("created_at")
+ @@map("batch_execution_requests")
+}
+model BatchAssignment {
+ appliedLaborRatePer15g Numeric(20,4)? @map("applied_labor_rate_per_15g")
+ id Uuid @id @default(uuid())
+ batchId Uuid @map("batch_id")
+ stepId VarChar(80) @map("step_id")
+ employeeId Uuid @map("employee_id")
+ plannedQuantity Int? @map("planned_quantity")
+ assignedAt TimestamptzString @map("assigned_at")
+ status VarChar(20) @default("ACTIVE")
+ note String?
+ createdBy Uuid @map("created_by")
+ updatedBy Uuid @map("updated_by")
+ createdAt TimestamptzString @default(now()) @map("created_at")
+ updatedAt TimestamptzString @default(now()) @map("updated_at")
+ contributions BatchOutputContribution[]
+ @@unique([batchId,stepId,employeeId])
+ @@map("batch_assignments")
+}
+
+model BatchAssignmentEvent {
+ id Uuid @id @default(uuid())
+ assignmentId Uuid @map("assignment_id")
+ quantityDelta Int @map("quantity_delta")
+ resultingQuantity Int? @map("resulting_quantity")
+ kind VarChar(10)
+ beforeState Json? @map("before_state")
+ afterState Json @map("after_state")
+ actorId Uuid @map("actor_id")
+ createdAt TimestamptzString @default(now()) @map("created_at")
+ @@map("batch_assignment_events")
+}
+model BatchWorkerReconciliation {
+ assignmentId Uuid @id @map("assignment_id")
+ status VarChar(20) @default("OPEN")
+ issuedGoldG Numeric(24,4)? @map("issued_gold_g")
+ receivedGoldG Numeric(24,4)? @map("received_gold_g")
+ differenceGoldG Numeric(24,4)? @map("difference_gold_g")
+ closedBy Uuid? @map("closed_by")
+ closedAt TimestamptzString? @map("closed_at")
+ updatedAt TimestamptzString @default(now()) @map("updated_at")
+ @@map("batch_worker_reconciliations")
+}
+model BatchReconciliationEvent {
+ id Uuid @id @default(uuid())
+ assignmentId Uuid @map("assignment_id")
+ action VarChar(10)
+ reason String
+ beforeState Json? @map("before_state")
+ afterState Json @map("after_state")
+ actorId Uuid @map("actor_id")
+ createdAt TimestamptzString @default(now()) @map("created_at")
+ @@map("batch_reconciliation_events")
+}
+model BatchOutput {
+ id Uuid @id @default(uuid())
+ batchId Uuid @map("batch_id")
+ stepId VarChar(80) @map("step_id")
+ workReference VarChar(160) @map("work_reference")
+ quantity Int
+ occurredAt TimestamptzString @map("occurred_at")
+ note String?
+ createdBy Uuid @map("created_by")
+ contributions BatchOutputContribution[]
+ @@unique([batchId,stepId,workReference])
+ @@map("batch_outputs")
+}
+model BatchOutputContribution {
+ outputId Uuid @map("output_id")
+ output BatchOutput @relation(fields:[outputId],references:[id])
+ assignmentId Uuid @map("assignment_id")
+ assignment BatchAssignment @relation(fields:[assignmentId],references:[id])
+ quantity Int
+ @@id([outputId,assignmentId])
+ @@map("batch_output_contributions")
+}
+model BatchMaterialMovement {
+ id Uuid @id @default(uuid())
+ batchId Uuid @map("batch_id")
+ stepId VarChar(80) @map("step_id")
+ employeeId Uuid @map("employee_id")
+ materialType VarChar(20) @map("material_type")
+ materialName VarChar(120) @map("material_name")
+ unit VarChar(10)
+ quantity Numeric(20,4)
+ kind VarChar(30)
+ effect Int @default(1)
+ groupId Uuid @map("group_id")
+ reversesId Uuid? @unique @map("reverses_id")
+ occurredAt TimestamptzString @map("occurred_at")
+ note String?
+ createdBy Uuid @map("created_by")
+ confirmedBy Uuid? @map("confirmed_by")
+ @@index([batchId,stepId,employeeId,materialType,materialName,unit],map:"batch_material_balance_idx")
+ @@map("batch_material_movements")
+}
+model BatchLossEntry {
+ id Uuid @id @default(uuid())
+ batchId Uuid @map("batch_id")
+ stepId VarChar(80) @map("step_id")
+ employeeId Uuid @map("employee_id")
+ materialType VarChar(20) @map("material_type")
+ materialName VarChar(120) @map("material_name")
+ unit VarChar(10)
+ quantity Numeric(20,4)
+ direction VarChar(10)
+ adjustsId Uuid? @map("adjusts_id")
+ occurredAt TimestamptzString @map("occurred_at")
+ reason String
+ createdBy Uuid @map("created_by")
+ @@map("batch_loss_entries")
+}
+model BatchLaborEntry {
+ id Uuid @id @default(uuid())
+ batchId Uuid @map("batch_id")
+ stepId VarChar(80) @map("step_id")
+ employeeId Uuid @map("employee_id")
+ outputId Uuid? @map("output_id")
+ amount Numeric(20,4)
+ currency Char(3) @default("THB")
+ direction VarChar(10)
+ adjustsId Uuid? @map("adjusts_id")
+ ratePer15g Numeric(20,4)? @map("rate_per_15g")
+ calculationNote String @map("calculation_note")
+ occurredAt TimestamptzString @map("occurred_at")
+ createdBy Uuid @map("created_by")
+ status VarChar(20) @default("RECORDED")
+ @@map("batch_labor_entries")
+}
+model BatchStepDependency {
+ batchId Uuid @map("batch_id")
+ stepId VarChar(80) @map("step_id")
+ dependsOnId VarChar(80) @map("depends_on_id")
+ step BatchStep @relation("BatchDependencies",fields:[batchId,stepId],references:[batchId,stepId])
+ dependency BatchStep @relation("BatchDependents",fields:[batchId,dependsOnId],references:[batchId,stepId])
+ @@id([batchId,stepId,dependsOnId])
+ @@map("batch_step_dependencies")
+}
+model BatchStatusHistory {
+ id Uuid @id @default(uuid())
+ batchId Uuid @map("batch_id")
+ batch ProductionBatch @relation(fields:[batchId],references:[id])
+ fromStatus VarChar(40)? @map("from_status")
+ toStatus VarChar(40) @map("to_status")
+ reason String
+ actorId Uuid @map("actor_id")
+ createdAt TimestamptzString @default(now()) @map("created_at")
+ @@index([batchId,createdAt,id],map:"batch_status_history_batch_idx")
+ @@map("batch_status_history")
+}
+model BatchAuditEvent {
+ id Uuid @id @default(uuid())
+ batchId Uuid @map("batch_id")
+ batch ProductionBatch @relation(fields:[batchId],references:[id])
+ action VarChar(80)
+ beforeState Json? @map("before_state")
+ afterState Json @map("after_state")
+ actorId Uuid @map("actor_id")
+ createdAt TimestamptzString @default(now()) @map("created_at")
+ @@index([batchId,createdAt,id],map:"batch_audit_events_batch_idx")
+ @@map("batch_audit_events")
+}
+model Component {
+ status VarChar(30) @default("ACTIVE")
+ imageUrl String? @map("image_url")
+ description String?
+ id Uuid @id @default(uuid())
+ code VarChar(80) @unique
+ name VarChar(180)
+ weightG Numeric(20,4)? @map("weight_g")
+ lengthMm Numeric(20,4)? @map("length_mm")
+ widthMm Numeric(20,4)? @map("width_mm")
+ heightMm Numeric(20,4)? @map("height_mm")
+ attributes Json?
+ createdAt TimestamptzString @default(now()) @map("created_at")
+ updatedAt TimestamptzString @default(now()) @map("updated_at")
+ createdBy Uuid? @map("created_by")
+ updatedBy Uuid? @map("updated_by")
+ bomItems BomItem[]
+ @@map("components")
+}
+model Bom {
+ id Uuid @id @default(uuid())
+ designModelId Uuid @map("design_model_id")
+ designModel DesignModel @relation(fields:[designModelId],references:[id])
+ createdAt TimestamptzString @default(now()) @map("created_at")
+ updatedAt TimestamptzString @default(now()) @map("updated_at")
+ createdBy Uuid? @map("created_by")
+ updatedBy Uuid? @map("updated_by")
+ items BomItem[]
+ @@index([designModelId],map:"boms_design_model_idx")
+ @@map("boms")
+}
+model BomItem {
+ id Uuid @id @default(uuid())
+ bomId Uuid @map("bom_id")
+ bom Bom @relation(fields:[bomId],references:[id])
+ itemType VarChar(30) @map("item_type")
+ componentId Uuid? @map("component_id")
+ component Component? @relation(fields:[componentId],references:[id])
+ nameSnapshot VarChar(180)? @map("name_snapshot")
+ quantity Numeric(20,4)?
+ weightG Numeric(20,4)? @map("weight_g")
+ unit VarChar(30)?
+ @@index([componentId],map:"bom_items_component_idx")
+ @@index([bomId],map:"bom_items_bom_idx")
+ @@map("bom_items")
+}
+model CatalogImage {
+ id Uuid @id @default(uuid())
+ mimeType VarChar(30) @map("mime_type")
+ sizeBytes Int @map("size_bytes")
+ createdBy Uuid @map("created_by")
+ createdAt TimestamptzString @default(now()) @map("created_at")
+ @@map("catalog_images")
+}
+
+model DesignModelGroup {
+ workflowRevisions ProductionWorkflowRevision[]
+ defaultLaborPricePer15g Numeric(20,4)? @map("default_labor_price_per_15g")
+ id Uuid @id @default(uuid())
+ name VarChar(180)
+ createdAt TimestamptzString @default(now()) @map("created_at")
+ updatedAt TimestamptzString @default(now()) @map("updated_at")
+ createdBy Uuid? @map("created_by")
+ updatedBy Uuid? @map("updated_by")
+ designs DesignModel[]
+ @@map("design_model_groups")
+}
+
+// Ordered steps and dependency edges are stored in each immutable JSON definition.
+// API validation enforces a DAG. No template copies are stored for INHERIT models.
+model ProductionWorkflowRevision {
+ id Uuid @id @default(uuid())
+ groupId Uuid? @map("group_id")
+ group DesignModelGroup? @relation(fields:[groupId],references:[id])
+ modelId Uuid? @map("model_id")
+ model DesignModel? @relation(fields:[modelId],references:[id])
+ revision Int
+ definition Json
+ createdBy Uuid @map("created_by")
+ createdAt TimestamptzString @default(now()) @map("created_at")
+ @@unique([groupId,revision])
+ @@unique([modelId,revision])
+ @@map("production_workflow_revisions")
+}
+
+// Gold only: labor remains in its existing per-currency ledger.
+model CustomerLedgerMonthlyBalance {
+  id Uuid @id @default(uuid())
+  customerId Uuid @map("customer_id")
+  period DateString
+  closingGoldG Numeric(30, 4) @map("closing_gold_g")
+  calculatedAt TimestamptzString @map("calculated_at")
+  isDirty Boolean @default(false) @map("is_dirty")
+  @@unique([customerId, period])
+  @@map("customer_ledger_monthly_balances")
+}
+
+model CustomerModelLaborPrice {
+  id Uuid @id @default(uuid())
+  customerId Uuid @map("customer_id")
+  designModelId Uuid @map("design_model_id")
+  laborPricePer15g Numeric(20, 4)? @map("labor_price_per_15g")
+  createdAt TimestamptzString @map("created_at")
+  updatedAt TimestamptzString @map("updated_at")
+  @@unique([customerId, designModelId])
+  @@map("customer_model_labor_prices")
+}
+
+model CustomerGroupLaborPrice {
+  id Uuid @id @default(uuid())
+  customerId Uuid @map("customer_id")
+  designModelGroupId Uuid @map("design_model_group_id")
+  laborPricePer15g Numeric(20, 4)? @map("labor_price_per_15g")
+  createdAt TimestamptzString @map("created_at")
+  updatedAt TimestamptzString @map("updated_at")
+  @@unique([customerId, designModelGroupId])
+  @@map("customer_group_labor_prices")
+}

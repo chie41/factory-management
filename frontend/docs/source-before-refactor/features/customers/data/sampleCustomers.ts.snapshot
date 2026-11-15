@@ -1,0 +1,9 @@
+import type { Customer } from '../types/customer'
+
+export const sampleCustomers: Customer[] = [
+  { id: 'c1', code: 'KH-001', name: 'Tiệm vàng Minh Anh', phone: '020 555 0198', address: '128 đường Samsenthai, Viêng Chăn', status: 'Đang hoạt động' },
+  { id: 'c2', code: 'KH-014', name: 'Kim Phát Jewelry', phone: '020 555 0231', address: 'Chợ Sáng, Viêng Chăn', status: 'Đang hoạt động' },
+  { id: 'c3', code: 'KH-028', name: 'Vạn Phúc', phone: '020 555 0188', address: 'Sisattanak', status: 'Có công nợ' },
+  { id: 'c4', code: 'KH-033', name: 'Phú Quý', phone: '020 555 0911', address: 'Luang Prabang', status: 'Đang hoạt động' },
+  { id: 'c5', code: 'KH-041', name: 'An Khang', phone: '020 555 0170', address: 'Savannakhet', status: 'Có công nợ' },
+]

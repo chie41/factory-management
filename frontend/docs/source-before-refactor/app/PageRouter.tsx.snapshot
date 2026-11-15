@@ -1,0 +1,11 @@
+import type { PageKey } from '../types/models'
+import { EmployeesPage } from '../pages/EmployeesPage'
+import { CustomersPage } from '../pages/CustomersPage'
+import { LedgerPage } from '../pages/LedgerPage'
+export function PageRouter({ page }: { page: PageKey }) {
+  switch (page) {
+    case 'employees': return <EmployeesPage />
+    case 'customers': return <CustomersPage />
+    case 'ledger': return <LedgerPage />
+  }
+}

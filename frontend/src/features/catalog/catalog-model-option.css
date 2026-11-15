@@ -1,0 +1,6 @@
+.catalog-model-option { display: flex; align-items: center; gap: 8px; min-width: 0; line-height: 16px; }
+.catalog-model-option-thumbnail { width: 30px; height: 30px; border-radius: 4px; flex-shrink: 0; overflow: hidden; display: grid; place-items: center; background: #eef1f5; color: #8792a2; }
+.catalog-model-option-thumbnail img { object-fit: cover; }
+.catalog-model-option-text { min-width: 0; }
+.catalog-model-option strong { display: block; font-size: 12px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.catalog-model-option small { display: block; font-size: 10px; color: #788494; }

@@ -1,0 +1,14 @@
+import { apiClient } from '../../../services/apiClient'
+import type { LoginCredentials, UserProfile } from '../types/auth'
+
+export async function login(credentials: LoginCredentials) {
+  const response = await apiClient.post('/auth/login', credentials)
+  const accessToken = response.data.accessToken ?? response.data.token ?? response.data.access_token
+  if (!accessToken) throw new Error('Backend không trả về access token')
+  return accessToken as string
+}
+
+export async function getCurrentUser() {
+  const response = await apiClient.get<UserProfile>('/auth/me')
+  return response.data
+}

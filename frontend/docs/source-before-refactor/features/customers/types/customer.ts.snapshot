@@ -1,0 +1,13 @@
+export type Customer = {
+  id: string
+  code?: string
+  customerCode?: string
+  name?: string
+  fullName?: string
+  phone?: string
+  phoneNumber?: string
+  address?: string
+  status?: string
+  note?: string
+  createdAt?: string
+}

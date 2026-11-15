@@ -1,0 +1,7 @@
+import { Tag } from 'antd'
+export function StatusTag({ status }: { status: string }) {
+  const isDebt = status.includes('nợ')
+  const inactive = status.includes('Ngừng') || status.includes('khóa')
+  const color = isDebt ? 'red' : inactive ? 'default' : 'green'
+  return <Tag color={color}>{status}</Tag>
+}

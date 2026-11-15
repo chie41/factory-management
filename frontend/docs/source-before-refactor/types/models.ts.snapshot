@@ -1,0 +1,81 @@
+export type PageKey = 'customers' | 'employees' | 'ledger'
+export type UserProfile = {
+  id?: string
+  username?: string
+  fullName?: string
+  name?: string
+  roles?: Array<string | { name?: string }>
+}
+export type ApiList<T> = {
+  items?: T[]
+  data?: T[]
+  total?: number
+  meta?: { total?: number }
+}
+export type Employee = {
+  id: string
+  code?: string
+  employeeCode?: string
+  username?: string
+  fullName?: string
+  name?: string
+  phone?: string
+  phoneNumber?: string
+  roles?: Array<string | { name?: string }>
+  status?: string
+  isActive?: boolean
+  currentWork?: string
+  joinedAt?: string
+  createdAt?: string
+}
+export type Customer = {
+  id: string
+  code?: string
+  customerCode?: string
+  name?: string
+  fullName?: string
+  phone?: string
+  phoneNumber?: string
+  address?: string
+  status?: string
+  note?: string
+  createdAt?: string
+}
+export type LedgerSummary = {
+  customerId?: string
+  id?: string
+  customerCode?: string
+  code?: string
+  customerName?: string
+  name?: string
+  lastTransactionAt?: string
+  latestTransactionAt?: string
+  goldDebtGram?: string | number
+  goldDebt?: string | number
+  laborDebtAmount?: string | number
+  laborDebt?: string | number
+  processingOrders?: number
+  openOrders?: number
+  latestDeliveryCode?: string
+  status?: string
+}
+export type LedgerEntry = {
+  id: string
+  date?: string
+  createdAt?: string
+  referenceCode?: string
+  reference?: string
+  actorName?: string
+  createdByName?: string
+  type?: string
+  direction?: string
+  receiveGram?: string | number
+  deliverGram?: string | number
+  goldInGram?: string | number
+  goldOutGram?: string | number
+  productName?: string
+  productCount?: number
+  laborDueAmount?: string | number
+  laborPaidAmount?: string | number
+  note?: string
+}

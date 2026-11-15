@@ -1,0 +1,57 @@
+@page {
+  size: A4 landscape;
+  margin: 10mm;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: white; color: #1f2638; font-family: Arial, "Noto Sans", "DejaVu Sans", sans-serif; font-size: 9pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.ledger-print-report { width: 100%; }
+header { break-inside: avoid; break-after: avoid; margin-bottom: 3mm; }
+h1 { text-align: center; font-size: 18pt; margin: 0 0 3mm; }
+header p { font-size: 11pt; margin: 0 0 2mm; }
+.report-dates { display: flex; justify-content: space-between; gap: 5mm; }
+.report-balances { display: flex; border: .3mm solid #758299; border-radius: 1mm; margin-bottom: 4mm; break-inside: avoid; break-after: avoid; }
+.report-balances > div { flex: 1; min-width: 0; padding: 3mm; }
+.report-balances > div + div { border-left: .25mm solid #aab2bf; }
+.report-balances b { display: block; font-size: 9pt; margin-bottom: 1.5mm; }
+.report-balances strong { display: block; font-size: 12pt; overflow-wrap: anywhere; }
+.report-balances strong span { display: block; }
+.report-scope { margin: 1.5mm 0 3mm; font-size: 8pt; color: #526078; break-after: avoid; }
+.ledger-print-table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 8pt; }
+/* Column weights in the shared table allocate actual A4 content width, not screen pixels. */
+.ledger-print-table thead { display: table-header-group; }
+.ledger-print-table th, .ledger-print-table td { border: .2mm solid #aab2bf; padding: 1mm 1.2mm; vertical-align: middle; overflow-wrap: anywhere; line-height: 1.35; }
+.ledger-print-table .ledger-group-divider { border-right: 2px solid #334155; }
+.ledger-print-table th { font-size: 7.5pt; background: #f0f3f8; text-align: center; overflow-wrap: normal; }
+.ledger-print-table tr { break-inside: avoid; page-break-inside: avoid; }
+.ledger-print-table .ledger-print-day { break-inside: auto; page-break-inside: auto; }
+/* Assigned by the PDF renderer after measuring the actual A4 layout. */
+.ledger-print-table .ledger-print-day-keep { break-inside: avoid; page-break-inside: avoid; }
+.ledger-print-table .ledger-print-product { break-inside: avoid; page-break-inside: avoid; }
+.ledger-print-product { border-top-color: #d8dee8 !important; border-bottom-color: #d8dee8 !important; }
+.ledger-print-money { text-align: right; }
+.ledger-product-price { text-align: right; }
+.ledger-number { text-align: right; }
+.ledger-print-table .ledger-before-summary { break-after: avoid; page-break-after: avoid; }
+.ledger-print-table .ledger-day-summary { break-before: avoid; }
+.ledger-print-date { background: white; vertical-align: top !important; }
+.ledger-print-date b, .ledger-print-date span { display: block; }
+.ledger-print-date b { white-space: nowrap; }
+.ledger-print-date span { margin-top: 1mm; font-size: 8pt; color: #526078; }
+.ledger-opening td, .ledger-day-summary td { background: #edf3ff; }
+.ledger-opening td > div { display: flex; justify-content: space-between; gap: 3mm; }
+.ledger-print-table .ledger-day-summary td { height: 5mm; padding: .5mm 1mm; font-size: 7pt; line-height: 1.15; }
+.ledger-print-table .ledger-summary-inline { display: flex; justify-content: space-between; align-items: center; gap: .5mm; white-space: nowrap; letter-spacing: -.25px; }
+.ledger-print-table .ledger-day-summary strong { display: inline; font-size: inherit; }
+.ledger-receive { color: #157044; text-align: right; }
+.ledger-deliver { color: #1946b8; text-align: right; }
+.ledger-weight-value { font-weight: 700; }
+.labor-unpaid { color: #cf1322; font-weight: bold; }
+.labor-partial { color: #b45309; font-weight: bold; }
+.ledger-product-line { min-height: 4.5mm; padding: .5mm 0; }
+.ledger-reversed { color: #697586; text-decoration: line-through; }
+.ant-tag { display: inline; border: 0; background: transparent; white-space: normal; font: inherit; }
+.ant-tag-blue { color: #1946b8; }
+.ant-tag-green { color: #157044; }
+.ant-tag-orange { color: #a84600; }
+.ant-tag-gold { color: #895500; }
+

@@ -1,0 +1,40 @@
+import { useEffect, useState } from 'react'
+import { message } from 'antd'
+import { api, tokenKey } from '../services/api'
+import type { UserProfile } from '../types/models'
+export function useAuth() {
+    const [token, setToken] = useState(() => localStorage.getItem(tokenKey))
+    const [profile, setProfile] = useState<UserProfile | null>(null)
+    useEffect(() => {
+        if (!token) return
+        api.get('/auth/me')
+        .then((res) => setProfile(res.data.data ?? res.data))
+        .catch(() => setProfile({ fullName: 'Bounmy', username: 'admin' }))
+    }, [token])
+
+    const handleLogin = async (values: {
+        username: string
+        password: string
+    }) => {
+        const res = await api.post('/auth/login', values)
+        const payload = res.data.data ?? res.data
+
+        const accessToken =
+            payload.access_token ?? payload.accessToken ?? payload.token
+
+        if (!accessToken) {
+            throw new Error('Backend không trả về access token')
+        }
+
+        localStorage.setItem(tokenKey, accessToken)
+        setToken(accessToken)
+        setProfile(payload.user ?? null)
+        message.success('Đăng nhập thành công')
+    }
+    const handleLogout = () => {
+        localStorage.removeItem(tokenKey)
+        setToken(null)
+        setProfile(null)
+    }
+    return { token, profile, handleLogin, handleLogout }
+}

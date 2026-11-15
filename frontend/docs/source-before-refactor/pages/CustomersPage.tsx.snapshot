@@ -1,0 +1,32 @@
+import { SearchOutlined } from '@ant-design/icons'
+import { Button, Input, Select, Typography } from 'antd'
+import type { ColumnsType } from 'antd/es/table'
+import type { Customer } from '../types/models'
+import { useCustomers } from '../hooks/useCustomers'
+import { PageFrame } from '../components/common/PageFrame'
+import { FilterRow } from '../components/common/FilterRow'
+import { DataTable } from '../components/common/DataTable'
+import { Identity } from '../components/common/Identity'
+import { StatusTag } from '../components/common/StatusTag'
+
+export function CustomersPage() {
+  const { rows, loading, search, setSearch, filtered } = useCustomers()
+  const columns: ColumnsType<Customer> = [
+    { title: 'KHÁCH HÀNG', render: (_, row) => <Identity name={row.name ?? row.fullName} code={row.code ?? row.customerCode} /> },
+    { title: 'MÃ KH', width: 110, render: (_, row) => row.code ?? row.customerCode ?? '—' },
+    { title: 'SĐT', width: 150, render: (_, row) => row.phone ?? row.phoneNumber ?? '—' },
+    { title: 'ĐỊA CHỈ', render: (_, row) => row.address ?? '—' },
+    { title: 'TRẠNG THÁI', width: 150, render: (_, row) => <StatusTag status={row.status ?? 'Đang hoạt động'} /> },
+    { title: '', width: 84, render: () => <Button type="link">Mở sổ</Button> },
+  ]
+  return (
+    <PageFrame title="Khách hàng" subtitle="Quản lý hồ sơ, liên hệ và trạng thái công nợ" action="Thêm khách hàng">
+      <Typography.Text className="summary-line">Tổng {rows.length} · Có công nợ {rows.filter((row) => row.status === 'Có công nợ').length} · Đang hoạt động {rows.filter((row) => row.status !== 'Có công nợ').length}</Typography.Text>
+      <FilterRow>
+        <Input prefix={<SearchOutlined />} placeholder="Tìm tên, mã khách hàng, số điện thoại..." value={search} onChange={(event) => setSearch(event.target.value)} />
+        <Select defaultValue="all" options={[{ value: 'all', label: 'Trạng thái: Tất cả' }, { value: 'debt', label: 'Có công nợ' }]} />
+      </FilterRow>
+      <DataTable columns={columns} dataSource={filtered} loading={loading} rowKey={(row) => row.id} />
+    </PageFrame>
+  )
+}

@@ -1,0 +1,39 @@
+export type LedgerSummary = {
+  customerId?: string
+  id?: string
+  customerCode?: string
+  code?: string
+  customerName?: string
+  name?: string
+  lastTransactionAt?: string
+  latestTransactionAt?: string
+  goldDebtGram?: string | number
+  goldDebt?: string | number
+  laborDebtAmount?: string | number
+  laborDebt?: string | number
+  processingOrders?: number
+  openOrders?: number
+  latestDeliveryCode?: string
+  status?: string
+}
+
+export type LedgerEntry = {
+  id: string
+  date?: string
+  createdAt?: string
+  referenceCode?: string
+  reference?: string
+  actorName?: string
+  createdByName?: string
+  type?: string
+  direction?: string
+  receiveGram?: string | number
+  deliverGram?: string | number
+  goldInGram?: string | number
+  goldOutGram?: string | number
+  productName?: string
+  productCount?: number
+  laborDueAmount?: string | number
+  laborPaidAmount?: string | number
+  note?: string
+}

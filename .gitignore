@@ -1,0 +1,186 @@
+# ==========================================
+# FACTORY MANAGEMENT - GITIGNORE
+# Frontend: React / TypeScript
+# Backend: NestJS / Prisma / PostgreSQL
+# ==========================================
+
+# ------------------------------------------
+# Dependencies
+# ------------------------------------------
+node_modules/
+**/node_modules/
+.pnpm-store/
+.yarn/cache/
+.yarn/unplugged/
+
+# ------------------------------------------
+# Environment variables & secrets
+# ------------------------------------------
+.env
+.env.*
+**/.env
+**/.env.*
+
+# Allow environment templates
+!.env.example
+!.env.sample
+!**/.env.example
+!**/.env.sample
+
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.jks
+secrets/
+**/secrets/
+
+# ------------------------------------------
+# Build outputs
+# ------------------------------------------
+dist/
+**/dist/
+build/
+**/build/
+out/
+**/out/
+.next/
+.nuxt/
+.vite/
+.turbo/
+.cache/
+**/.cache/
+coverage/
+**/coverage/
+
+# ------------------------------------------
+# Logs
+# ------------------------------------------
+*.log
+logs/
+**/logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ------------------------------------------
+# Temporary files
+# ------------------------------------------
+tmp/
+temp/
+**/tmp/
+**/temp/
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*.swp
+*.swo
+*~
+
+# ------------------------------------------
+# Operating systems
+# ------------------------------------------
+.DS_Store
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ------------------------------------------
+# IDE / Editor
+# ------------------------------------------
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.iml
+.history/
+
+# ------------------------------------------
+# TypeScript
+# ------------------------------------------
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# ------------------------------------------
+# Testing
+# ------------------------------------------
+.nyc_output/
+playwright-report/
+test-results/
+blob-report/
+__snapshots__/__diff_output__/
+
+# ------------------------------------------
+# Prisma
+# Keep schema.prisma and migrations tracked
+# ------------------------------------------
+backend/prisma/*.db
+backend/prisma/*.db-journal
+backend/prisma/*.sqlite
+backend/prisma/*.sqlite-journal
+
+# ------------------------------------------
+# Database dumps & backups
+# ------------------------------------------
+*.sql.gz
+*.dump
+*.backup.sql
+*.db
+*.sqlite
+*.sqlite3
+backups/
+**/backups/
+
+# ------------------------------------------
+# Uploaded files / runtime storage
+# ------------------------------------------
+uploads/
+**/uploads/
+storage/
+**/storage/
+
+# ------------------------------------------
+# Generated PDF / documents
+# ------------------------------------------
+tmp/pdfs/
+*.pdf.tmp
+
+# ------------------------------------------
+# Local tooling
+# ------------------------------------------
+.codex/
+.claude/settings.local.json
+
+# ------------------------------------------
+# Python utilities
+# ------------------------------------------
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# ------------------------------------------
+# Local configuration
+# ------------------------------------------
+*.local
+*.local.json
+
+# ------------------------------------------
+# IMPORTANT: Keep tracked
+# ------------------------------------------
+# backend/prisma/schema.prisma
+# backend/migrations/sql/
+# frontend/src/
+# backend/src/
+# package.json
+# package-lock.json
+# pnpm-lock.yaml
+# yarn.lock
+# README.md
+# docs/
+# *.md
+.artifact-work/

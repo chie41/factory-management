@@ -1,0 +1,24 @@
+export const money = (value?: string | number) => {
+  const amount = Number(value ?? 0)
+  if (!amount) return '—'
+  return new Intl.NumberFormat('vi-VN').format(amount) + ' ₫'
+}
+export const gram = (value?: string | number) => {
+  const amount = Number(value ?? 0)
+  if (!amount) return '—'
+  return new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 2 }).format(amount) + ' g'
+}
+export const dateText = (value?: string) => {
+  if (!value) return '—'
+  if (/Hôm|\d{2}\/\d{2}/.test(value)) return value
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString('vi-VN')
+}
+export const initials = (name?: string) =>
+  (name ?? 'HN')
+    .split(' ')
+    .filter(Boolean)
+    .slice(-2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase()
