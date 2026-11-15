@@ -75,7 +75,7 @@ function defaultManual(layout:GoldTemplateDto):GoldManualDto {
 function getWorks(source:Source):GoldWork[]{
  return source.workers.flatMap(worker=>worker.jobs);
 }
-function totals(source:Source,workIds:string[],manual:GoldManualDto,layout:GoldTemplateDto,previous:string|null,strict=false) {
+export function calculateGoldTotals(source:Source,workIds:string[],manual:GoldManualDto,layout:GoldTemplateDto,previous:string|null,strict=false) {
  checkTemplate(layout);checkManual(manual);
  if(!arraysOk(workIds,2000)||new Set(workIds).size!==workIds.length)throw new BadRequestException('Danh sách công việc không hợp lệ');
  const works=getWorks(source), byId=new Map(works.map(work=>[work.id,work]));
@@ -266,7 +266,7 @@ export class GoldRefiningService {
    const layout=await this.layout(c,date),source=await this.source(c,date);
    const manual=defaultManual(layout),ids=getWorks(source).map(work=>work.id);
    const prev=await this.previous(c,date);
-   const calculated=totals(source,ids,manual,layout,prev);
+   const calculated=calculateGoldTotals(source,ids,manual,layout,prev);
    const r=await c.query<Session>(`INSERT INTO gold_refining_sessions
     (business_date,source_snapshot,selected_work_ids,manual_entries,layout_snapshot,totals_snapshot,created_by,updated_by)
     VALUES($1::date,$2::jsonb,$3::jsonb,$4::jsonb,$5::jsonb,$6::jsonb,$7,$7) RETURNING *`,
@@ -281,7 +281,7 @@ export class GoldRefiningService {
    const row=await this.find(c,id,true);
    this.ensureEditable(row,dto.version);
    const prev=await this.previous(c,row.business_date);
-   const calculated=totals(row.source_snapshot,dto.selectedWorkIds,dto.manual,dto.layout,prev);
+   const calculated=calculateGoldTotals(row.source_snapshot,dto.selectedWorkIds,dto.manual,dto.layout,prev);
    const updated=await c.query<Session>(`UPDATE gold_refining_sessions
     SET selected_work_ids=$2::jsonb,manual_entries=$3::jsonb,layout_snapshot=$4::jsonb,
        totals_snapshot=$5::jsonb,updated_by=$6,updated_at=clock_timestamp(),version=version+1
@@ -299,7 +299,7 @@ export class GoldRefiningService {
    const available=new Set(getWorks(source).map(work=>work.id));
    const ids=row.selected_work_ids.filter(id=>available.has(id));
    const removed=row.selected_work_ids.filter(id=>!available.has(id));
-   const calculated=totals(source,ids,row.manual_entries,row.layout_snapshot,await this.previous(c,row.business_date));
+   const calculated=calculateGoldTotals(source,ids,row.manual_entries,row.layout_snapshot,await this.previous(c,row.business_date));
    const updated=await c.query<Session>(`UPDATE gold_refining_sessions
     SET source_snapshot=$2::jsonb,selected_work_ids=$3::jsonb,totals_snapshot=$4::jsonb,
       updated_by=$5,updated_at=clock_timestamp(),version=version+1
@@ -316,7 +316,7 @@ export class GoldRefiningService {
    this.ensureEditable(row,version);
    if(lockAfterHours!==undefined)await this.admin(actor,c);
    const hours=lockAfterHours??row.lock_after_hours;
-   const calculated=totals(row.source_snapshot,row.selected_work_ids,row.manual_entries,row.layout_snapshot,
+   const calculated=calculateGoldTotals(row.source_snapshot,row.selected_work_ids,row.manual_entries,row.layout_snapshot,
     await this.previous(c,row.business_date),true);
    const updated=await c.query<Session>(`UPDATE gold_refining_sessions
      SET status=CASE WHEN $3::int=0 THEN 'LOCKED' ELSE 'FINALIZED' END,
