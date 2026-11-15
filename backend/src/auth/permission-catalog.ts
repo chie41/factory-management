@@ -17,6 +17,11 @@ export const LEDGER_WORKFLOW_PERMISSIONS = [
   ['cash.periods.manage', 'Quản lý kỳ báo cáo Thu/Chi'],
 ] as const;
 export const PERMISSION_CATALOG = [
+  ['gold.sessions.read', 'Xem phiên Tịnh vàng'],
+  ['gold.sessions.edit', 'Tạo và cập nhật phiên Tịnh vàng'],
+  ['gold.sessions.finalize', 'Chốt phiên Tịnh vàng'],
+  ['gold.sessions.reopen', 'Mở lại phiên Tịnh vàng đã chốt'],
+  ['gold.templates.manage', 'Quản lý mẫu Tịnh vàng mặc định'],
   ['production.reconciliation.manage','Chốt / mở lại đối soát Hao-Heo sản xuất'],
   ['production.execution.manage', 'Vận hành công đoạn sản xuất'],
   ['production.assignments.manage', 'Phân công thợ sản xuất'],
