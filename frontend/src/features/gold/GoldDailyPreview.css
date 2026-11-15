@@ -50,7 +50,7 @@
 .gold-add-row .anticon{font-size:11px}
 .gold-grid-footer{height:40px;background:#f5f5f5;color:#333;font-size:12px;font-weight:600}
 .gold-grid-footer strong{white-space:nowrap}
-.gold-day-summary{position:sticky;top:16px;align-self:start;min-width:0;border:1px solid #e5e9f0;border-radius:8px;background:#fff;padding:16px;max-height:calc(100vh - 32px);overflow-y:auto}
+.gold-day-summary{position:sticky;top:16px;align-self:start;min-width:0;border:1px solid #e5e9f0;border-radius:8px;background:#fff;padding:16px;max-height:none;overflow:visible}
 .gold-day-summary h2{font-size:16px;font-weight:600;color:#172b4d;margin:0 0 16px}
 .gold-day-summary h3{font-size:11px;font-weight:600;color:#667085;margin:15px 0 8px}
 .gold-summary-items{display:flex;flex-direction:column;gap:0}
@@ -120,3 +120,6 @@
 .gold-work-picker-row{min-height:46px}
 .gold-work-picker-weight{font-size:12px;display:block}
 .gold-work-picker-list{overflow:auto}
+
+.gold-no-workers{padding:18px 12px;color:#667085;font-size:12px}
+.gold-add-row:disabled{cursor:not-allowed;opacity:.45}
