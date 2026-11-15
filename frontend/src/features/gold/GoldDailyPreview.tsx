@@ -103,6 +103,8 @@ export function GoldDailyPreview() {
   const labelTotal = useMemo(() => total(data.labels.map(row => row.count ? (numberValue(row.unit) ?? 0) * (numberValue(row.count) ?? 0) : null)), [data.labels])
   const othersPlus = useMemo(() => total(data.others.map(row => numberValue(row.add))), [data.others])
   const othersMinus = useMemo(() => total(data.others.map(row => numberValue(row.subtract))), [data.others])
+  // Confirmed business formula. UI-only calculation until real gold sources are integrated.
+  const finalGold = issued + weighed + (numberValue(data.customerDebt) ?? 0) - bagTotal - labelTotal + othersPlus - othersMinus
   return <div className="gold-page">
     <div className="gold-page-heading"><div><Typography.Title level={3}>Tịnh vàng hằng ngày</Typography.Title><Typography.Text type="secondary">Sheet vận hành · Trọng lượng (g)</Typography.Text></div>
       <div className="gold-date-controls"><Button aria-label="Ngày trước" icon={<LeftOutlined />} onClick={() => moveDate(-1)} /><input className="gold-date-input" type="date" value={day} onChange={e => setDate(e.target.value)} aria-label="Ngày tịnh vàng" /><Button aria-label="Ngày sau" icon={<RightOutlined />} onClick={() => moveDate(1)} /><Tag color="blue">Bản xem trước</Tag></div></div>
@@ -134,7 +136,7 @@ export function GoldDailyPreview() {
       <div className="gold-summary-line"><span>Yếu tố khác (+)</span><strong>{format(othersPlus, ' g')}</strong></div>
       <div className="gold-summary-line"><span>Yếu tố khác (−)</span><strong>{format(othersMinus, ' g')}</strong></div>
       <div className="gold-summary-divider" /><div className="gold-summary-line"><span>Lần trước đã chốt</span><strong>{format(numberValue(data.previousClosed), ' g')}</strong></div>
-      <div className="gold-summary-result"><small>TỔNG VÀNG TỊNH ĐƯỢC</small><strong>Chưa xác định</strong><p>Chờ xác nhận công thức nghiệp vụ và kết nối API. Không tính tổng từ các số mẫu.</p></div>
+      <div className="gold-summary-result"><small>TỔNG VÀNG TỊNH ĐƯỢC</small><strong>{format(finalGold, ' g')}</strong><p>Tổng giao thợ + Cân hiện tại + Khách nợ vàng − Túi bóng − Nhãn đá + Khác cộng − Khác trừ. Chỉ là phép tính trên dữ liệu xem trước.</p></div>
       <Button type="primary" block disabled title="Chưa triển khai ghi dữ liệu và chốt phiên">Chốt phiên tịnh vàng</Button>
     </aside></div>
     <Modal open={modal === 'debt'} title="Khách nợ vàng" onCancel={() => setModal(null)} onOk={() => setModal(null)} okText="Đóng" cancelButtonProps={{ style: { display: 'none' } }}><p>Tổng nợ vàng minh họa: <strong>{format(numberValue(data.customerDebt), ' g')}</strong></p><Input.TextArea value={customerNotes} onChange={e => setCustomerNotes(e.target.value)} rows={3} aria-label="Ghi chú xem trước" /><Typography.Text type="secondary">Chưa có drill-through dữ liệu khách hàng thật.</Typography.Text></Modal>
